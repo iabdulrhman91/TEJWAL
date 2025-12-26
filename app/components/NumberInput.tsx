@@ -58,8 +58,9 @@ export default function NumberInput({
                     if (!isNaN(val)) onChange(val);
                     else if (e.target.value === '') onChange(0);
                 }}
-                className={`w-full text-center py-2 focus:outline-none font-bold num-en ${disabled ? 'bg-gray-50' : ''}`}
-                style={{ fontVariantNumeric: 'lining-nums', fontFeatureSettings: '"locl" 0' }}
+                className={`flex-1 min-w-0 py-2 focus:outline-none font-bold num-en text-center-force ${disabled ? 'bg-gray-50' : ''}`}
+                dir="ltr"
+                style={{ direction: 'ltr', fontVariantNumeric: 'lining-nums', fontFeatureSettings: '"locl" 0' }}
             />
             <button
                 type="button"

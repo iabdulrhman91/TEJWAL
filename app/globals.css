@@ -28,7 +28,6 @@ input[type=text].num-en,
   font-feature-settings: "lnum" 1, "tnum" 1, "locl" 0 !important;
   font-family: 'StrongNumbers', 'Inter', sans-serif !important;
   direction: ltr !important;
-  text-align: left !important;
   unicode-bidi: bidi-override !important;
 }
 
