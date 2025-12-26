@@ -9,9 +9,9 @@ export default async function SettingsPage() {
         redirect('/login')
     }
 
-    let initialUsers = []
-    let initialSuppliers = []
-    let initialCountries = []
+    let initialUsers: any[] = []
+    let initialSuppliers: any[] = []
+    let initialCountries: any[] = []
     if (session.role === 'Admin') {
         initialUsers = await prisma.user.findMany({
             orderBy: { createdAt: 'desc' }
