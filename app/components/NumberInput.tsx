@@ -58,7 +58,7 @@ export default function NumberInput({
                     if (!isNaN(val)) onChange(val);
                     else if (e.target.value === '') onChange(0);
                 }}
-                className={`w-full text-center-force py-2 focus:outline-none font-bold num-en ${disabled ? 'bg-gray-50' : ''}`}
+                className={`w-full text-center py-2 focus:outline-none font-bold num-en ${disabled ? 'bg-gray-50' : ''}`}
                 style={{ fontVariantNumeric: 'lining-nums', fontFeatureSettings: '"locl" 0' }}
             />
             <button
