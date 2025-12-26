@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 1) Users
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("Sales") // 'Admin' | 'Sales'
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  quotesCreated Quote[] @relation("CreatedBy")
+  quotesSent    Quote[] @relation("SentBy")
+  auditLogs     AuditLog[]
+}
+
+// 2) Customers
+model Customer {
+  id            Int      @id @default(autoincrement())
+  name          String
+  phone         String   @unique // Normalized format: 966XXXXXXXXX
+  email         String?
+  company       String?
+  notes         String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastQuoteDate DateTime?
+  
+  quotes        Quote[]
+  
+  @@index([phone])
+}
+
+// 3) Quotes
+model Quote {
+  id                     Int       @id @default(autoincrement())
+  quoteNumber            String    @unique // Format: Q-YYYY-000001
+  status                 String    @default("Draft") // Draft, Ready, Sent, Archived
+
+  // Customer Info (Legacy - will be deprecated)
+  customerName           String
+  customerPhone          String?
+  
+  // Customer Reference (New)
+  customerId             Int?
+  customer               Customer? @relation(fields: [customerId], references: [id])
+  
+  // Travelers
+  travelersCountAdults   Int       @default(1)
+  travelersCountChildren Int       @default(0)
+  travelersCountInfants  Int       @default(0)
+  
+  destination            String?
+  
+  // Notes
+  notesInternal          String?
+  notesCustomer          String?
+  
+  // Pricing and Profit
+  totalFlights           Float     @default(0)
+  totalHotels            Float     @default(0)
+  totalServices          Float     @default(0)
+  markup                 Float     @default(0) // Central Profit Margin
+  grandTotal             Float     @default(0) // (Flights+Hotels+Services) + markup
+  
+  // Meta
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  
+  // Tracking
+  sentAt                 DateTime?
+  sentTo                 String?
+  lastSendStatus         String?   // 'success' | 'fail'
+  lastSendError          String?
+  
+  approvedAt             DateTime?
+  cancelledAt            DateTime?
+
+  // Relations
+  createdByUserId        Int
+  createdBy              User      @relation("CreatedBy", fields: [createdByUserId], references: [id])
+  
+  sentByUserId           Int?
+  sentBy                 User?     @relation("SentBy", fields: [sentByUserId], references: [id])
+  
+  flightSegments         FlightSegment[]
+  hotelStays             HotelStay[]
+  quoteServices          QuoteService[]
+  auditLogs              AuditLog[]
+}
+
+// 4) FlightSegments
+model FlightSegment {
+  id                Int      @id @default(autoincrement())
+  quoteId           Int
+  quote             Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  
+  fromAirport       String
+  toAirport         String
+  stopoverAirport   String?
+  
+  departureDateTime DateTime?
+  arrivalDateTime   DateTime?
+  
+  // Return Flight Details (Optional for RoundTrip)
+  returnFromAirport       String?
+  returnToAirport         String?
+  returnStopoverAirport   String?
+  returnDepartureDateTime DateTime?
+  returnArrivalDateTime   DateTime?
+  returnAirline           String?
+  
+  airline           String
+  flightType        String   @default("OneWay") // OneWay, RoundTrip, Multi
+  baggageKg         Int      @default(23)
+  
+  ticketCount       Int      @default(1)
+  
+  // Pricing
+  supplier          String?  // e.g. "Amadeus", "Direct"
+  costPrice         Float    @default(0) // Internal cost
+  
+  ticketPriceAdult  Float    @default(0)
+  ticketPriceChild  Float    @default(0)
+  ticketPriceInfant Float    @default(0)
+  
+  segmentTotal      Float    @default(0) // Usually matches costPrice in this setup
+  
+  notes             String?
+}
+
+// 5) HotelStays
+model HotelStay {
+  id                Int      @id @default(autoincrement())
+  quoteId           Int
+  quote             Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  
+  city              String
+  hotelName         String
+  hotelStars        Int      @default(3)
+  
+  checkInDate       DateTime?
+  checkOutDate      DateTime?
+  
+  roomType          String?  // e.g. "Double", "Suite"
+  mealPlan          String?  // e.g. "Breakfast", "All Inclusive"
+  
+  roomCount         Int      @default(1)
+  roomPricePerNight Float    @default(0)
+  
+  nights            Int      @default(1) // Calculated or input
+  
+  supplier          String?  // e.g. "Booking", "Expedia"
+  costPrice         Float    @default(0) // Internal cost
+  stayTotal         Float    @default(0)
+
+  notes             String?
+}
+
+// 6) QuoteServices (Additional Services on a Quote)
+model QuoteService {
+  id             Int      @id @default(autoincrement())
+  quoteId        Int
+  quote          Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  
+  serviceName    String
+  serviceDetails String?
+  
+  quantity       Int      @default(1)
+  unitPrice      Float    @default(0)
+  
+  supplier       String?  // e.g. "Local Guide"
+  costPrice      Float    @default(0)
+  serviceTotal   Float    @default(0)
+}
+
+// 7) ServiceCatalog (Ready-made services)
+model ServiceCatalog {
+  id               Int     @id @default(autoincrement())
+  name             String
+  defaultUnitPrice Float?
+  isActive         Boolean @default(true)
+}
+
+// 8) AuditLogs
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String   // e.g., 'CREATE_QUOTE', 'APPROVE_QUOTE', 'CANCEL_QUOTE', 'SEND_WHATSAPP', 'DOWNLOAD_PDF'
+  quoteId   Int?
+  quote     Quote?   @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  metadata  String?  // JSON string
+  createdAt DateTime @default(now())
+}
+
+// 9) Airports
+model Airport {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique // IATA Code
+  cityAr    String
+  cityEn    String
+  countryAr String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([code])
+  @@index([cityAr])
+  @@index([cityEn])
+}
+
+// 10) Airlines
+model Airline {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique // IATA Code (e.g., SV, EK)
+  nameAr    String
+  nameEn    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([code])
+  @@index([nameAr])
+}
+
+// 11) Countries
+model Country {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique // ISO Code (e.g., SA, AE)
+  nameAr    String
+  nameEn    String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([nameAr])
+}
+
+// 12) Hotel Library
+model Hotel {
+  id          Int      @id @default(autoincrement())
+  name        String
+  city        String
+  stars       Int      @default(3)
+  description String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([name, city])
+  @@index([name])
+  @@index([city])
+}
+
+// 13) Suppliers
+model Supplier {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  supportsFlights Boolean @default(false)
+  supportsHotels  Boolean @default(false)
+  supportsServices Boolean @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}

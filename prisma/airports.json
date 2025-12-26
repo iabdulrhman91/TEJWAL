@@ -1,0 +1,590 @@
+[
+  {
+    "code": "RUH",
+    "cityAr": "الرياض",
+    "cityEn": "Riyadh",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "JED",
+    "cityAr": "جدة",
+    "cityEn": "Jeddah",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "DMM",
+    "cityAr": "الدمام",
+    "cityEn": "Dammam",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "MED",
+    "cityAr": "المدينة المنورة",
+    "cityEn": "Madinah",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "ABH",
+    "cityAr": "أبها",
+    "cityEn": "Abha",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "GIZ",
+    "cityAr": "جازان",
+    "cityEn": "Jazan",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "HAS",
+    "cityAr": "حائل",
+    "cityEn": "Ha'il",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "ELQ",
+    "cityAr": "القصيم",
+    "cityEn": "Gassim",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "TIF",
+    "cityAr": "الطائف",
+    "cityEn": "Taif",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "TUU",
+    "cityAr": "تبوك",
+    "cityEn": "Tabuk",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "YNB",
+    "cityAr": "ينبع",
+    "cityEn": "Yanbu",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "AHB",
+    "cityAr": "الباحة",
+    "cityEn": "Al-Baha",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "HOE",
+    "cityAr": "الحوف",
+    "cityEn": "Al-Jouf",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "RAO",
+    "cityAr": "عرعر",
+    "cityEn": "Arar",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "BHH",
+    "cityAr": "بيشة",
+    "cityEn": "Bisha",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "DWD",
+    "cityAr": "الدوادمي",
+    "cityEn": "Dawadmi",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "GAY",
+    "cityAr": "القريات",
+    "cityEn": "Guriat",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "KMX",
+    "cityAr": "خميس مشيط",
+    "cityEn": "Khamis Mushait",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "SLF",
+    "cityAr": "السليل",
+    "cityEn": "Al-Sulaiyl",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "TUI",
+    "cityAr": "تورايف",
+    "cityEn": "Turaif",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "WAE",
+    "cityAr": "وادي الدواسر",
+    "cityEn": "Wadi Al Dawasir",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "SHW",
+    "cityAr": "شرورة",
+    "cityEn": "Sharurah",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "AJF",
+    "cityAr": "الجوف",
+    "cityEn": "Al-Jouf",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "QOW",
+    "cityAr": "القويعية",
+    "cityEn": "Al-Quway'iyah",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "URA",
+    "cityAr": "أملج",
+    "cityEn": "Umluj",
+    "countryAr": "السعودية"
+  },
+  {
+    "code": "DXB",
+    "cityAr": "دبي",
+    "cityEn": "Dubai",
+    "countryAr": "الإمارات"
+  },
+  {
+    "code": "AUH",
+    "cityAr": "أبو ظبي",
+    "cityEn": "Abu Dhabi",
+    "countryAr": "الإمارات"
+  },
+  {
+    "code": "SHJ",
+    "cityAr": "الشارقة",
+    "cityEn": "Sharjah",
+    "countryAr": "الإمارات"
+  },
+  {
+    "code": "DOH",
+    "cityAr": "الدوحة",
+    "cityEn": "Doha",
+    "countryAr": "قطر"
+  },
+  {
+    "code": "KWI",
+    "cityAr": "الكويت",
+    "cityEn": "Kuwait City",
+    "countryAr": "الكويت"
+  },
+  {
+    "code": "MCT",
+    "cityAr": "مسقط",
+    "cityEn": "Muscat",
+    "countryAr": "عمان"
+  },
+  {
+    "code": "BAH",
+    "cityAr": "المنامة",
+    "cityEn": "Manama",
+    "countryAr": "البحرين"
+  },
+  {
+    "code": "CAI",
+    "cityAr": "القاهرة",
+    "cityEn": "Cairo",
+    "countryAr": "مصر"
+  },
+  {
+    "code": "ALY",
+    "cityAr": "الإسكندرية",
+    "cityEn": "Alexandria",
+    "countryAr": "مصر"
+  },
+  {
+    "code": "SSH",
+    "cityAr": "شرم الشيخ",
+    "cityEn": "Sharm El Sheikh",
+    "countryAr": "مصر"
+  },
+  {
+    "code": "HRG",
+    "cityAr": "الغردقة",
+    "cityEn": "Hurghada",
+    "countryAr": "مصر"
+  },
+  {
+    "code": "AMM",
+    "cityAr": "عمان",
+    "cityEn": "Amman",
+    "countryAr": "الأردن"
+  },
+  {
+    "code": "AQJ",
+    "cityAr": "العقبة",
+    "cityEn": "Aqaba",
+    "countryAr": "الأردن"
+  },
+  {
+    "code": "BEY",
+    "cityAr": "بيروت",
+    "cityEn": "Beirut",
+    "countryAr": "لبنان"
+  },
+  {
+    "code": "KRT",
+    "cityAr": "الخرطوم",
+    "cityEn": "Khartoum",
+    "countryAr": "السودان"
+  },
+  {
+    "code": "TUN",
+    "cityAr": "تونس",
+    "cityEn": "Tunis",
+    "countryAr": "تونس"
+  },
+  {
+    "code": "CMN",
+    "cityAr": "الدار البيضاء",
+    "cityEn": "Casablanca",
+    "countryAr": "المغرب"
+  },
+  {
+    "code": "RAK",
+    "cityAr": "مراكش",
+    "cityEn": "Marrakech",
+    "countryAr": "المغرب"
+  },
+  {
+    "code": "ALG",
+    "cityAr": "الجزائر",
+    "cityEn": "Algiers",
+    "countryAr": "الجزائر"
+  },
+  {
+    "code": "TIP",
+    "cityAr": "طرابلس",
+    "cityEn": "Tripoli",
+    "countryAr": "ليبيا"
+  },
+  {
+    "code": "BAG",
+    "cityAr": "بغداد",
+    "cityEn": "Baghdad",
+    "countryAr": "العراق"
+  },
+  {
+    "code": "EBL",
+    "cityAr": "أربيل",
+    "cityEn": "Erbil",
+    "countryAr": "العراق"
+  },
+  {
+    "code": "IST",
+    "cityAr": "اسطنبول",
+    "cityEn": "Istanbul",
+    "countryAr": "تركيا"
+  },
+  {
+    "code": "SAW",
+    "cityAr": "اسطنبول (صبيحة)",
+    "cityEn": "Istanbul Sabiha",
+    "countryAr": "تركيا"
+  },
+  {
+    "code": "AYT",
+    "cityAr": "أنطاليا",
+    "cityEn": "Antalya",
+    "countryAr": "تركيا"
+  },
+  {
+    "code": "LHR",
+    "cityAr": "لندن (هيثرو)",
+    "cityEn": "London Heathrow",
+    "countryAr": "بريطانيا"
+  },
+  {
+    "code": "LGW",
+    "cityAr": "لندن (جاتويك)",
+    "cityEn": "London Gatwick",
+    "countryAr": "بريطانيا"
+  },
+  {
+    "code": "CDG",
+    "cityAr": "باريس (ديغول)",
+    "cityEn": "Paris Charles de Gaulle",
+    "countryAr": "فرنسا"
+  },
+  {
+    "code": "ORY",
+    "cityAr": "باريس (أورلي)",
+    "cityEn": "Paris Orly",
+    "countryAr": "فرنسا"
+  },
+  {
+    "code": "FRA",
+    "cityAr": "فرانكفورت",
+    "cityEn": "Frankfurt",
+    "countryAr": "ألمانيا"
+  },
+  {
+    "code": "MUC",
+    "cityAr": "ميونيخ",
+    "cityEn": "Munich",
+    "countryAr": "ألمانيا"
+  },
+  {
+    "code": "AMS",
+    "cityAr": "أمستردام",
+    "cityEn": "Amsterdam",
+    "countryAr": "هولندا"
+  },
+  {
+    "code": "MAD",
+    "cityAr": "مدريد",
+    "cityEn": "Madrid",
+    "countryAr": "إسبانيا"
+  },
+  {
+    "code": "BCN",
+    "cityAr": "برشلونة",
+    "cityEn": "Barcelona",
+    "countryAr": "إسبانيا"
+  },
+  {
+    "code": "FCO",
+    "cityAr": "روما",
+    "cityEn": "Rome",
+    "countryAr": "إيطاليا"
+  },
+  {
+    "code": "MXP",
+    "cityAr": "ميلانو",
+    "cityEn": "Milan",
+    "countryAr": "إيطاليا"
+  },
+  {
+    "code": "ATH",
+    "cityAr": "أثينا",
+    "cityEn": "Athens",
+    "countryAr": "اليونان"
+  },
+  {
+    "code": "VIE",
+    "cityAr": "فيينا",
+    "cityEn": "Vienna",
+    "countryAr": "النمسا"
+  },
+  {
+    "code": "ZRH",
+    "cityAr": "زيورخ",
+    "cityEn": "Zurich",
+    "countryAr": "سويسرا"
+  },
+  {
+    "code": "GVA",
+    "cityAr": "جنيف",
+    "cityEn": "Geneva",
+    "countryAr": "سويسرا"
+  },
+  {
+    "code": "JFK",
+    "cityAr": "نيويورك (جي إف كيه)",
+    "cityEn": "New York JFK",
+    "countryAr": "أمريكا"
+  },
+  {
+    "code": "LAX",
+    "cityAr": "لوس أنجلوس",
+    "cityEn": "Los Angeles",
+    "countryAr": "أمريكا"
+  },
+  {
+    "code": "ORD",
+    "cityAr": "شيكاغو",
+    "cityEn": "Chicago",
+    "countryAr": "أمريكا"
+  },
+  {
+    "code": "MIA",
+    "cityAr": "ميامي",
+    "cityEn": "Miami",
+    "countryAr": "أمريكا"
+  },
+  {
+    "code": "SFO",
+    "cityAr": "سان فرانسيسكو",
+    "cityEn": "San Francisco",
+    "countryAr": "أمريكا"
+  },
+  {
+    "code": "IAD",
+    "cityAr": "واشنطن",
+    "cityEn": "Washington Dulles",
+    "countryAr": "أمريكا"
+  },
+  {
+    "code": "YYZ",
+    "cityAr": "تورونتو",
+    "cityEn": "Toronto",
+    "countryAr": "كندا"
+  },
+  {
+    "code": "YVR",
+    "cityAr": "فانكوفر",
+    "cityEn": "Vancouver",
+    "countryAr": "كندا"
+  },
+  {
+    "code": "SYD",
+    "cityAr": "سيدني",
+    "cityEn": "Sydney",
+    "countryAr": "أستراليا"
+  },
+  {
+    "code": "MEL",
+    "cityAr": "ملبورن",
+    "cityEn": "Melbourne",
+    "countryAr": "أستراليا"
+  },
+  {
+    "code": "BKK",
+    "cityAr": "بانكوك",
+    "cityEn": "Bangkok",
+    "countryAr": "تايلاند"
+  },
+  {
+    "code": "HKT",
+    "cityAr": "بوكيت",
+    "cityEn": "Phuket",
+    "countryAr": "تايلاند"
+  },
+  {
+    "code": "SIN",
+    "cityAr": "سنغافورة",
+    "cityEn": "Singapore",
+    "countryAr": "سنغافورة"
+  },
+  {
+    "code": "HKG",
+    "cityAr": "هونج كونج",
+    "cityEn": "Hong Kong",
+    "countryAr": "الصين"
+  },
+  {
+    "code": "NRT",
+    "cityAr": "طوكيو (ناريتا)",
+    "cityEn": "Tokyo Narita",
+    "countryAr": "اليابان"
+  },
+  {
+    "code": "HND",
+    "cityAr": "طوكيو (هانيدا)",
+    "cityEn": "Tokyo Haneda",
+    "countryAr": "اليابان"
+  },
+  {
+    "code": "ICN",
+    "cityAr": "سول",
+    "cityEn": "Seoul Incheon",
+    "countryAr": "كوريا الجنوبية"
+  },
+  {
+    "code": "PEK",
+    "cityAr": "بكين",
+    "cityEn": "Beijing",
+    "countryAr": "الصين"
+  },
+  {
+    "code": "PVG",
+    "cityAr": "شنغهاي",
+    "cityEn": "Shanghai",
+    "countryAr": "الصين"
+  },
+  {
+    "code": "CAN",
+    "cityAr": "قوانغتشو",
+    "cityEn": "Guangzhou",
+    "countryAr": "الصين"
+  },
+  {
+    "code": "DEL",
+    "cityAr": "دلهي",
+    "cityEn": "Delhi",
+    "countryAr": "الهند"
+  },
+  {
+    "code": "BOM",
+    "cityAr": "مومباي",
+    "cityEn": "Mumbai",
+    "countryAr": "الهند"
+  },
+  {
+    "code": "KHI",
+    "cityAr": "كراتشي",
+    "cityEn": "Karachi",
+    "countryAr": "باكستان"
+  },
+  {
+    "code": "ISB",
+    "cityAr": "إسلام آباد",
+    "cityEn": "Islamabad",
+    "countryAr": "باكستان"
+  },
+  {
+    "code": "LHE",
+    "cityAr": "لاهور",
+    "cityEn": "Lahore",
+    "countryAr": "باكستان"
+  },
+  {
+    "code": "DAC",
+    "cityAr": "دكا",
+    "cityEn": "Dhaka",
+    "countryAr": "بنجلاديش"
+  },
+  {
+    "code": "CMB",
+    "cityAr": "كولومبو",
+    "cityEn": "Colombo",
+    "countryAr": "سريلانكا"
+  },
+  {
+    "code": "MLE",
+    "cityAr": "ماليه (المالديف)",
+    "cityEn": "Male",
+    "countryAr": "المالديف"
+  },
+  {
+    "code": "KUL",
+    "cityAr": "كوالالمبور",
+    "cityEn": "Kuala Lumpur",
+    "countryAr": "ماليزيا"
+  },
+  {
+    "code": "CGK",
+    "cityAr": "جاكرتا",
+    "cityEn": "Jakarta",
+    "countryAr": "إندونيسيا"
+  },
+  {
+    "code": "DPS",
+    "cityAr": "بالي",
+    "cityEn": "Bali",
+    "countryAr": "إندونيسيا"
+  },
+  {
+    "code": "MNL",
+    "cityAr": "مانيلا",
+    "cityEn": "Manila",
+    "countryAr": "الفلبين"
+  },
+  {
+    "code": "SGN",
+    "cityAr": "هوشي منه",
+    "cityEn": "Ho Chi Minh",
+    "countryAr": "فيتنام"
+  }
+]
