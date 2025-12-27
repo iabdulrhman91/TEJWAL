@@ -336,7 +336,7 @@ export default function QuoteForm({
 
                 if (result.success) {
                     const id = initialQuoteId || result.id
-                    router.push(`/ quotes / ${id}${type === 'Send' ? '?action=send' : ''} `)
+                    router.push(`/quotes/${id}${type === 'Send' ? '?action=send' : ''}`)
                 } else {
                     alert('حدث خطأ أثناء حفظ العرض')
                 }
