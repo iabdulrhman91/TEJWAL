@@ -4,14 +4,14 @@ import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
-export async function getHotels(query: string = '') {
+export async function getHotels(query: string = '', onlyActive: boolean = false) {
     return await prisma.hotel.findMany({
         where: {
             OR: [
                 { name: { contains: query } },
                 { city: { contains: query } }
             ],
-            isActive: true
+            isActive: onlyActive ? true : undefined
         },
         take: 10
     })

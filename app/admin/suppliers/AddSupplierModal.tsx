@@ -7,9 +7,10 @@ import { createSupplier } from './actions'
 interface AddSupplierModalProps {
     isOpen: boolean
     onClose: () => void
+    onSuccess?: () => void
 }
 
-export default function AddSupplierModal({ isOpen, onClose }: AddSupplierModalProps) {
+export default function AddSupplierModal({ isOpen, onClose, onSuccess }: AddSupplierModalProps) {
     const [name, setName] = useState('')
     const [supportsFlights, setSupportsFlights] = useState(false)
     const [supportsHotels, setSupportsHotels] = useState(false)
@@ -27,6 +28,7 @@ export default function AddSupplierModal({ isOpen, onClose }: AddSupplierModalPr
                 supportsHotels,
                 supportsServices: false
             })
+            onSuccess?.()
             onClose()
             setName('')
             setSupportsFlights(false)

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toggleAirportStatus, deleteAirport } from './actions'
 import AddAirportModal from './AddAirportModal'
+import StatusBadge from '@/app/components/StatusBadge'
 
 interface Airport {
     id: number
@@ -65,34 +66,31 @@ export default function AirportTable({ initialAirports }: { initialAirports: Air
             </div>
 
             <div className="overflow-x-auto">
-                <table className="w-full text-right">
-                    <thead className="bg-gray-50 text-gray-500 text-sm uppercase">
+                <table className="w-full text-right border-collapse">
+                    <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th className="px-6 py-4 font-medium">الكود (IATA)</th>
-                            <th className="px-6 py-4 font-medium">المدينة (عربي)</th>
-                            <th className="px-6 py-4 font-medium">المدينة (انجليزي)</th>
-                            <th className="px-6 py-4 font-medium">الدولة</th>
-                            <th className="px-6 py-4 font-medium text-center">الحالة</th>
-                            <th className="px-6 py-4 font-medium text-center">الإجراءات</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الكود (IATA)</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">المدينة (عربي)</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">المدينة (انجليزي)</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الدولة</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">الحالة</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {filteredAirports.map((airport) => (
-                            <tr key={airport.id} className="hover:bg-gray-50 transition">
-                                <td className="px-6 py-4 font-bold text-blue-600">{airport.code}</td>
-                                <td className="px-6 py-4">{airport.cityAr}</td>
-                                <td className="px-6 py-4 text-gray-500">{airport.cityEn}</td>
-                                <td className="px-6 py-4">{airport.countryAr || '-'}</td>
+                            <tr key={airport.id} className="hover:bg-blue-50/50 transition duration-150 ease-in-out border-b border-gray-50 last:border-b-0">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">{airport.code}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{airport.cityAr}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-sans">{airport.cityEn}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{airport.countryAr || '-'}</td>
                                 <td className="px-6 py-4 text-center">
-                                    <button
-                                        onClick={() => handleToggle(airport.id, airport.isActive)}
-                                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${airport.isActive
-                                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                                : 'bg-red-100 text-red-700 hover:bg-red-200'
-                                            }`}
-                                    >
-                                        {airport.isActive ? 'نشط' : 'غير نشط'}
-                                    </button>
+                                    <StatusBadge
+                                        isActive={airport.isActive}
+                                        isLoading={false}
+                                        onToggle={() => handleToggle(airport.id, airport.isActive)}
+                                        inactiveText="غير نشط"
+                                    />
                                 </td>
                                 <td className="px-6 py-4 text-center">
                                     <button

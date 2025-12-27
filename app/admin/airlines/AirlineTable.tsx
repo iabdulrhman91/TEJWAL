@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toggleAirlineStatus, deleteAirline } from './actions'
 import AddAirlineModal from './AddAirlineModal'
+import StatusBadge from '@/app/components/StatusBadge'
 
 interface Airline {
     id: number
@@ -64,32 +65,29 @@ export default function AirlineTable({ initialAirlines }: { initialAirlines: Air
             </div>
 
             <div className="overflow-x-auto">
-                <table className="w-full text-right">
-                    <thead className="bg-gray-50 text-gray-500 text-sm uppercase">
+                <table className="w-full text-right border-collapse">
+                    <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th className="px-6 py-4 font-medium">الكود (IATA)</th>
-                            <th className="px-6 py-4 font-medium">الاسم (عربي)</th>
-                            <th className="px-6 py-4 font-medium">الاسم (انجليزي)</th>
-                            <th className="px-6 py-4 font-medium text-center">الحالة</th>
-                            <th className="px-6 py-4 font-medium text-center">الإجراءات</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الكود (IATA)</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الاسم (عربي)</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الاسم (انجليزي)</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">الحالة</th>
+                            <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {filteredAirlines.map((airline) => (
-                            <tr key={airline.id} className="hover:bg-gray-50 transition">
-                                <td className="px-6 py-4 font-bold text-blue-600">{airline.code}</td>
-                                <td className="px-6 py-4">{airline.nameAr}</td>
-                                <td className="px-6 py-4 text-gray-500">{airline.nameEn}</td>
+                            <tr key={airline.id} className="hover:bg-blue-50/50 transition duration-150 ease-in-out border-b border-gray-50 last:border-b-0">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">{airline.code}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{airline.nameAr}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-sans">{airline.nameEn}</td>
                                 <td className="px-6 py-4 text-center">
-                                    <button
-                                        onClick={() => handleToggle(airline.id, airline.isActive)}
-                                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${airline.isActive
-                                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                            : 'bg-red-100 text-red-700 hover:bg-red-200'
-                                            }`}
-                                    >
-                                        {airline.isActive ? 'نشط' : 'غير نشط'}
-                                    </button>
+                                    <StatusBadge
+                                        isActive={airline.isActive}
+                                        isLoading={false}
+                                        onToggle={() => handleToggle(airline.id, airline.isActive)}
+                                        inactiveText="غير نشط"
+                                    />
                                 </td>
                                 <td className="px-6 py-4 text-center">
                                     <button

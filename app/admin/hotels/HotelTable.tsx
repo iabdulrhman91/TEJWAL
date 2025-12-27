@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toggleHotelStatus, deleteHotel } from './actions'
 import { Star, Trash2, Search, Building2, Plus } from 'lucide-react'
 import AddHotelModal from './AddHotelModal'
+import StatusBadge from '@/app/components/StatusBadge'
 
 interface Hotel {
     id: number
@@ -95,15 +96,12 @@ export default function HotelTable({ initialHotels }: { initialHotels: Hotel[] }
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-center">
-                                    <button
-                                        onClick={() => handleToggle(hotel.id, hotel.isActive)}
-                                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${hotel.isActive
-                                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                            : 'bg-red-100 text-red-700 hover:bg-red-200'
-                                            }`}
-                                    >
-                                        {hotel.isActive ? 'نشط' : 'غير نشط'}
-                                    </button>
+                                    <StatusBadge
+                                        isActive={hotel.isActive}
+                                        isLoading={false}
+                                        onToggle={() => handleToggle(hotel.id, hotel.isActive)}
+                                        inactiveText="غير نشط"
+                                    />
                                 </td>
                                 <td className="px-6 py-4 text-center">
                                     <button

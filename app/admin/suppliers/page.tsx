@@ -1,9 +1,7 @@
 import { Suspense } from 'react'
-import { Plus, Building2 } from 'lucide-react'
+import { Building2 } from 'lucide-react'
 import { getSuppliers } from './actions'
-import AddSupplierModal from './AddSupplierModal'
 import SupplierTable from './SupplierTable'
-import ClientPageWrapper from './ClientPageWrapper'
 
 export default async function SuppliersPage() {
     const { data: suppliers } = await getSuppliers()
@@ -18,10 +16,8 @@ export default async function SuppliersPage() {
                         </span>
                         إدارة الموردين
                     </h1>
-                    <p className="mt-2 text-gray-500 mr-16">تحكم في قائمة مزودي الخدمات (طيران، فنادق، إلخ) وصلاحياتهم</p>
+                    <p className="mt-2 text-gray-500 mr-16">تحكم في قائمة مزودي الخدمات (طيران، فنادق، إلخ) وصلاحياتهم - محدث</p>
                 </div>
-
-                <ClientPageWrapper suppliers={suppliers || []} />
             </div>
 
             <Suspense fallback={<div className="text-center py-12 text-gray-400">جاري التحميل...</div>}>

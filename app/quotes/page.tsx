@@ -33,7 +33,7 @@ export default async function QuotesPage({
     }
 
     return (
-        <div className="p-8 max-w-[1600px] mx-auto">
+        <div className="p-8 max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">لوحة إدارة العروض</h1>
@@ -52,27 +52,27 @@ export default async function QuotesPage({
 
             <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-right">
-                        <thead className="bg-gray-50 text-gray-600 border-b text-sm uppercase tracking-wider">
+                    <table className="w-full text-right border-collapse">
+                        <thead className="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th className="p-4 font-medium min-w-[120px]">رقم العرض</th>
-                                <th className="p-4 font-medium min-w-[200px]">العميل</th>
-                                <th className="p-4 font-medium">الوجهة</th>
-                                <th className="p-4 font-medium">الإجمالي</th>
-                                <th className="p-4 font-medium">الحالة</th>
-                                <th className="p-4 font-medium">تاريخ الإنشاء</th>
-                                <th className="p-4 font-medium text-center min-w-[180px]">إجراءات سريعة</th>
+                                <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[120px]">رقم العرض</th>
+                                <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[200px]">العميل</th>
+                                <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الوجهة</th>
+                                <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الإجمالي</th>
+                                <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الحالة</th>
+                                <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">تاريخ الإنشاء</th>
+                                <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center min-w-[180px]">إجراءات سريعة</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y text-sm">
+                        <tbody className="divide-y divide-gray-100 text-sm">
                             {quotes.map((quote) => (
-                                <tr key={quote.id} className="hover:bg-gray-50/50 transition group">
-                                    <td className="p-4 font-bold text-blue-600 font-mono">
+                                <tr key={quote.id} className="hover:bg-blue-50/50 transition duration-150 ease-in-out border-b border-gray-50 last:border-b-0 group">
+                                    <td className="px-6 py-4 whitespace-nowrap font-bold text-blue-600 font-mono">
                                         <Link href={`/quotes/${quote.id}`} className="hover:underline">
                                             {quote.quoteNumber}
                                         </Link>
                                     </td>
-                                    <td className="p-4">
+                                    <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="font-semibold text-gray-900">{quote.customerName}</div>
                                         {quote.customerPhone && (
                                             <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
@@ -80,23 +80,23 @@ export default async function QuotesPage({
                                             </div>
                                         )}
                                     </td>
-                                    <td className="p-4 font-medium text-gray-700">{quote.destination || '-'}</td>
-                                    <td className="p-4 font-bold text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-700">{quote.destination || '-'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
                                         <div className="flex items-center gap-1 justify-end">
                                             {quote.grandTotal.toLocaleString('en-US')}
                                             <CurrencySymbol className="w-4 h-4 text-gray-400" />
                                         </div>
                                     </td>
-                                    <td className="p-4">
+                                    <td className="px-6 py-4 whitespace-nowrap">
                                         {getStatusBadge(quote.status)}
                                     </td>
-                                    <td className="p-4 text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                                         <div className="flex items-center gap-1.5" title={new Date(quote.createdAt).toLocaleString('en-US')}>
                                             <Calendar size={14} />
                                             <span>{new Date(quote.createdAt).toLocaleDateString('en-US')}</span>
                                         </div>
                                     </td>
-                                    <td className="p-4">
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
                                         <div className="flex items-center justify-center gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
 
                                             {/* 1. Open */}
@@ -121,7 +121,6 @@ export default async function QuotesPage({
                                             {/* 3. WhatsApp (If not locked) */}
                                             {quote.status !== 'Approved' && quote.status !== 'Cancelled' && (
                                                 <div className="scale-90">
-                                                    {/* We reuse the button but minimal style might be better, sticking to requested logic */}
                                                     <WhatsAppButton quoteId={quote.id} phone={quote.customerPhone} status={quote.status} />
                                                 </div>
                                             )}

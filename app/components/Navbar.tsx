@@ -13,11 +13,8 @@ export default async function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
                     <div className="flex items-center gap-6">
-                        <Link href="/" className="flex items-center gap-2">
-                            <img src="/logo.png" alt="Tejwal Logo" className="h-10 w-auto" />
-                            <div className="hidden lg:block">
-                                <span className="text-lg font-black text-gray-900 tracking-tight">تجوال</span>
-                            </div>
+                        <Link href="/" className="flex items-center gap-2 py-2">
+                            <img src="/logo.png" alt="Tejwal Logo" className="h-14 w-auto object-contain" />
                         </Link>
 
                         <NavLinks isAdmin={session.role === 'Admin'} />

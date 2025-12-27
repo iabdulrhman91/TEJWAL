@@ -9,7 +9,7 @@ export default async function CountriesPage() {
     })
 
     return (
-        <div className="p-8 space-y-6">
+        <div className="p-8 max-w-7xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-black text-gray-800 flex items-center gap-3">

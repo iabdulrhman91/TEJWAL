@@ -37,7 +37,7 @@ export default function HotelAutocomplete({
                 return
             }
             try {
-                const data = await getHotels(query)
+                const data = await getHotels(query, true)
                 setResults(data)
             } catch (error) {
                 console.error('Hotel search error:', error)

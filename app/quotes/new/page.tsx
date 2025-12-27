@@ -3,7 +3,7 @@ import { getActiveSuppliers } from '../actions'
 import QuoteForm from './quote-form'
 
 export default async function NewQuotePage() {
-    const services = await getServices()
+    const services = await getServices(true)
     const flightSuppliers = await getActiveSuppliers('flight')
     const hotelSuppliers = await getActiveSuppliers('hotel')
     const serviceSuppliers = await getActiveSuppliers('service')

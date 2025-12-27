@@ -4,8 +4,9 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-export async function getServices() {
+export async function getServices(onlyActive = false) {
     return await prisma.serviceCatalog.findMany({
+        where: onlyActive ? { isActive: true } : undefined,
         orderBy: { id: 'desc' }
     })
 }

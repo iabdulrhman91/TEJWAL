@@ -148,7 +148,7 @@ export default function QuoteForm({
             total: s.serviceTotal,
             supplier: s.supplier,
             costPrice: s.costPrice || s.unitPrice,
-            isCollapsed: false
+            isCollapsed: true
         })) || []
     )
     const [flights, setFlights] = useState<Flight[]>(
@@ -175,7 +175,8 @@ export default function QuoteForm({
             returnAirline: f.returnAirline,
             returnWeight: f.returnWeight,
             showTransit: !!f.stopoverAirport,
-            showReturnTransit: !!f.returnStopoverAirport
+            showReturnTransit: !!f.returnStopoverAirport,
+            isCollapsed: true
         })) || []
     )
     const [hotels, setHotels] = useState<Hotel[]>(
@@ -192,7 +193,8 @@ export default function QuoteForm({
             supplier: h.supplier,
             costPrice: h.costPrice || h.stayTotal,
             price: h.stayTotal,
-            notes: h.notes
+            notes: h.notes,
+            isCollapsed: true
         })) || []
     )
     const [markup, setMarkup] = useState<number>(initialData?.markup || 0)
@@ -270,6 +272,12 @@ export default function QuoteForm({
 
     // Updaters
     const updateService = (id: string, field: keyof SelectedService, value: any) => {
+        if (field === 'isCollapsed' && value === false) {
+            setIsCustomerCollapsed(true)
+            setFlights(prev => prev.map(f => ({ ...f, isCollapsed: true })))
+            setHotels(prev => prev.map(h => ({ ...h, isCollapsed: true })))
+        }
+
         setSelectedServices(prev => prev.map(s => {
             if (s.localId === id) {
                 const updated = { ...s, [field]: value }
@@ -283,11 +291,22 @@ export default function QuoteForm({
                 updated.total = updated.costPrice || 0
                 return updated
             }
+            if (field === 'isCollapsed' && value === false) {
+                return { ...s, isCollapsed: true }
+            }
             return s
         }))
     }
 
     const updateFlight = (id: string, data: Partial<Flight> | keyof Flight, value?: any) => {
+        const isExpanding = (typeof data === 'string' && data === 'isCollapsed' && value === false) || (typeof data === 'object' && data.isCollapsed === false);
+
+        if (isExpanding) {
+            setIsCustomerCollapsed(true)
+            setSelectedServices(prev => prev.map(s => ({ ...s, isCollapsed: true })))
+            setHotels(prev => prev.map(h => ({ ...h, isCollapsed: true })))
+        }
+
         setFlights(prev => prev.map(f => {
             if (f.localId === id) {
                 let updated: Flight;
@@ -307,11 +326,20 @@ export default function QuoteForm({
                 }
                 return updated
             }
+            if (isExpanding) return { ...f, isCollapsed: true };
             return f
         }))
     }
 
     const updateHotel = (id: string, data: Partial<Hotel> | keyof Hotel, value?: any) => {
+        const isExpanding = (typeof data === 'string' && data === 'isCollapsed' && value === false) || (typeof data === 'object' && data.isCollapsed === false);
+
+        if (isExpanding) {
+            setIsCustomerCollapsed(true)
+            setFlights(prev => prev.map(f => ({ ...f, isCollapsed: true })))
+            setSelectedServices(prev => prev.map(s => ({ ...s, isCollapsed: true })))
+        }
+
         setHotels(prev => prev.map(h => {
             if (h.localId === id) {
                 if (typeof data === 'string') {
@@ -319,6 +347,7 @@ export default function QuoteForm({
                 }
                 return { ...h, ...data }
             }
+            if (isExpanding) return { ...h, isCollapsed: true };
             return h
         }))
     }
@@ -510,17 +539,7 @@ export default function QuoteForm({
                                 </>
                             )}
                         </div>
-                        {/* Done Button to Collapse */}
-                        <div className="md:col-span-3 flex justify-end pt-4 border-t border-gray-100 mt-2">
-                            <button
-                                type="button"
-                                onClick={() => setIsCustomerCollapsed(true)}
-                                className="bg-gray-900 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-black transition-colors flex items-center gap-2 shadow-sm"
-                            >
-                                <CheckCircle2 size={16} />
-                                تم - تصغير
-                            </button>
-                        </div>
+
                     </div>
                 )}
             </div>
@@ -545,7 +564,13 @@ export default function QuoteForm({
                                             <div className="text-[15px] font-black text-blue-900 leading-tight mb-0.5">{flight.airline || 'طيران غير محدد'}</div>
                                             <div className="flex items-center gap-2 text-[12px] text-gray-500 font-medium">
                                                 <span>الوزن:</span>
-                                                <span className="font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded text-[11px]">{flight.weight || '0'} كجم</span>
+                                                <span className="font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded text-[11px]">
+                                                    {flight.weight || '0'}
+                                                    {flight.flightType === 'RoundTrip' && (
+                                                        <span className="opacity-50"> / {flight.returnWeight || flight.weight || '0'}</span>
+                                                    )}
+                                                    {' '}كجم
+                                                </span>
                                             </div>
                                             <div className="mt-1.5 flex items-center">
                                                 <span className="bg-blue-50 text-blue-700 text-[11px] font-bold px-3 py-1 rounded-full border border-blue-100">
@@ -874,17 +899,7 @@ export default function QuoteForm({
                                         </div>
                                     </div>
 
-                                    {/* Done Button */}
-                                    <div className="mt-6 flex justify-end pt-4 border-t border-gray-100">
-                                        <button
-                                            type="button"
-                                            onClick={() => updateFlight(flight.localId, 'isCollapsed', true)}
-                                            className="bg-gray-900 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-black transition-colors flex items-center gap-2"
-                                        >
-                                            <CheckCircle2 size={16} />
-                                            تم - تصغير
-                                        </button>
-                                    </div>
+
                                 </>
                             )
                             }
@@ -902,7 +917,7 @@ export default function QuoteForm({
                     <button type="button" onClick={addHotel} className="text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium transition"><Plus size={18} /> إضافة فندق</button>
                 </div>
                 <div className="space-y-4">
-                    {hotels.map(hotel => (
+                    {hotels.map((hotel, index) => (
                         <div key={hotel.localId} className={`rounded-xl border transition-all duration-300 ${hotel.isCollapsed ? 'bg-white border-purple-100 hover:border-purple-300 shadow-sm' : 'bg-gray-50 border-gray-200 relative p-4'}`}>
 
                             {hotel.isCollapsed ? (
@@ -980,6 +995,11 @@ export default function QuoteForm({
                             ) : (
                                 <>
                                     <button type="button" onClick={() => removeHotel(hotel.localId)} className="absolute top-4 left-4 text-gray-400 hover:text-red-500"><Trash2 size={18} /></button>
+
+                                    <div className="mb-6 pb-4 border-b border-gray-200 border-dashed flex justify-between items-center">
+                                        <div className="text-sm font-bold text-purple-900 bg-purple-50 px-3 py-1 rounded-lg">الفندق {index + 1}</div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                                         <div className="md:col-span-2"><label className="text-xs text-gray-500">اسم الفندق</label><HotelAutocomplete value={hotel.hotelName} onChange={(name, city, stars) => { if (city !== undefined && stars !== undefined) { updateHotel(hotel.localId, { hotelName: name, city, stars }) } else { updateHotel(hotel.localId, 'hotelName', name) } }} /></div>
                                         <div><label className="text-xs text-gray-500">المدينة</label><input value={hotel.city} onChange={e => updateHotel(hotel.localId, 'city', e.target.value)} className="w-full p-2 border rounded" /></div>
@@ -1167,17 +1187,7 @@ export default function QuoteForm({
                                             </div>
                                         </div>
                                     </div>
-                                    {/* Done Button */}
-                                    <div className="mt-6 flex justify-end pt-4 border-t border-gray-100">
-                                        <button
-                                            type="button"
-                                            onClick={() => updateHotel(hotel.localId, 'isCollapsed', true)}
-                                            className="bg-gray-900 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-black transition-colors flex items-center gap-2"
-                                        >
-                                            <CheckCircle2 size={16} />
-                                            تم - تصغير
-                                        </button>
-                                    </div>
+
                                 </>
                             )}
                         </div>
@@ -1261,14 +1271,7 @@ export default function QuoteForm({
 
                                     {/* Done Button */}
                                     <div className="flex items-center gap-2 pb-0.5">
-                                        <button
-                                            type="button"
-                                            onClick={() => updateService(service.localId, 'isCollapsed', true)}
-                                            className="bg-green-600 text-white p-2.5 rounded-lg hover:bg-green-700 transition"
-                                            title="تم"
-                                        >
-                                            <CheckCircle2 size={18} />
-                                        </button>
+
                                         <button type="button" onClick={() => removeService(service.localId)} className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100 transition"><Trash2 size={18} /></button>
                                     </div>
                                 </div>

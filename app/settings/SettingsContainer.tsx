@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { User, Lock, Share2, Users, Save, ShieldCheck, Key, Globe, Layout, Building2, Plus } from 'lucide-react'
 import { updateProfile, changePassword, updateIntegrationSettings } from './actions'
 import UserList from '../users/user-list'
-import AddSupplierModal from '../admin/suppliers/AddSupplierModal'
 import SupplierTable from '../admin/suppliers/SupplierTable'
 import CountryTable from '../admin/countries/CountryTable'
 
@@ -20,7 +19,6 @@ export default function SettingsContainer({
     initialCountries?: any[]
 }) {
     const [activeTab, setActiveTab] = useState('profile')
-    const [isAddSupplierOpen, setIsAddSupplierOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState({ type: '', text: '' })
 
@@ -215,13 +213,6 @@ export default function SettingsContainer({
                                 <h2 className="text-xl font-bold text-gray-900">إدارة الموظفين</h2>
                                 <p className="text-sm text-gray-500">التحكم في صلاحيات الوصول للموظفين</p>
                             </div>
-                            <a
-                                href="/users/new"
-                                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-blue-700 transition"
-                            >
-                                <User size={16} />
-                                إضافة موظف
-                            </a>
                         </div>
                         <UserList initialUsers={initialUsers || []} />
                     </div>
@@ -284,16 +275,8 @@ export default function SettingsContainer({
                                 <h2 className="text-xl font-bold text-gray-900">إدارة الموردين</h2>
                                 <p className="text-sm text-gray-500">التحكم في قائمة مزودي الخدمات (طيران، فنادق، إلخ)</p>
                             </div>
-                            <button
-                                onClick={() => setIsAddSupplierOpen(true)}
-                                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-blue-700 transition"
-                            >
-                                <Plus size={16} />
-                                إضافة مورد
-                            </button>
                         </div>
                         <SupplierTable initialSuppliers={initialSuppliers || []} />
-                        <AddSupplierModal isOpen={isAddSupplierOpen} onClose={() => setIsAddSupplierOpen(false)} />
                     </div>
                 )}
             </div>
