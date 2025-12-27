@@ -28,6 +28,7 @@ interface SelectedService {
     total: number
     supplier?: string
     costPrice: number
+    isCollapsed?: boolean
 }
 
 const ROOM_CATEGORIES: Record<string, string[]> = {
@@ -110,6 +111,14 @@ export default function QuoteForm({
     const fromDateTime = (date: Date | null) => date ? new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''
     const fromDate = (date: Date | null) => date ? new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10) : ''
 
+    const formatArabicUnit = (count: number, unitSingular: string, unitDual: string, unitPlural: string) => {
+        if (!count || count === 0) return `0 ${unitPlural}`;
+        if (count === 1) return unitSingular;
+        if (count === 2) return unitDual;
+        if (count >= 3 && count <= 10) return `${count} ${unitPlural}`;
+        return `${count} ${unitSingular}`;
+    };
+
     const [customer, setCustomer] = useState({
         name: initialData?.customerName || '',
         phone: initialData?.customerPhone || '',
@@ -138,7 +147,8 @@ export default function QuoteForm({
             quantity: s.quantity,
             total: s.serviceTotal,
             supplier: s.supplier,
-            costPrice: s.costPrice || s.unitPrice
+            costPrice: s.costPrice || s.unitPrice,
+            isCollapsed: false
         })) || []
     )
     const [flights, setFlights] = useState<Flight[]>(
@@ -196,19 +206,26 @@ export default function QuoteForm({
 
     // Handlers
     const addService = () => {
-        setSelectedServices(prev => [...prev, {
+        setIsCustomerCollapsed(true)
+        setFlights(prev => prev.map(f => ({ ...f, isCollapsed: true })))
+        setHotels(prev => prev.map(h => ({ ...h, isCollapsed: true })))
+        setSelectedServices(prev => [...prev.map(s => ({ ...s, isCollapsed: true })), {
             localId: Math.random().toString(36).substr(2, 9),
             name: '',
             unitPrice: 0,
             quantity: 0,
             total: 0,
             costPrice: 0,
-            supplier: ''
+            supplier: '',
+            isCollapsed: false
         }])
     }
 
     const addFlight = () => {
-        setFlights(prev => [...prev, {
+        setIsCustomerCollapsed(true)
+        setSelectedServices(prev => prev.map(s => ({ ...s, isCollapsed: true })))
+        setHotels(prev => prev.map(h => ({ ...h, isCollapsed: true })))
+        setFlights(prev => [...prev.map(f => ({ ...f, isCollapsed: true })), {
             localId: Math.random().toString(36).substr(2, 9),
             from: '',
             to: '',
@@ -226,7 +243,10 @@ export default function QuoteForm({
     }
 
     const addHotel = () => {
-        setHotels(prev => [...prev, {
+        setIsCustomerCollapsed(true)
+        setFlights(prev => prev.map(f => ({ ...f, isCollapsed: true })))
+        setSelectedServices(prev => prev.map(s => ({ ...s, isCollapsed: true })))
+        setHotels(prev => [...prev.map(h => ({ ...h, isCollapsed: true })), {
             localId: Math.random().toString(36).substr(2, 9),
             city: '',
             hotelName: '',
@@ -529,7 +549,7 @@ export default function QuoteForm({
                                             </div>
                                             <div className="mt-1.5 flex items-center">
                                                 <span className="bg-blue-50 text-blue-700 text-[11px] font-bold px-3 py-1 rounded-full border border-blue-100">
-                                                    {flight.ticketCount} {flight.ticketCount > 1 ? 'تذاكر' : 'تذكرة'}
+                                                    {formatArabicUnit(flight.ticketCount, 'تذكرة', 'تذكرتين', 'تذاكر')}
                                                 </span>
                                             </div>
                                         </div>
@@ -937,7 +957,7 @@ export default function QuoteForm({
                                         <div className="md:w-1/4 flex flex-col items-end gap-2 border-r border-gray-100 pr-6">
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className="bg-purple-50 text-purple-700 text-[11px] font-bold px-2 py-0.5 rounded border border-purple-100">
-                                                    {hotel.roomCount || 1} {hotel.roomCount > 10 ? 'وحدة' : 'وحدات'}
+                                                    {formatArabicUnit(hotel.roomCount || 1, 'وحدة', 'وحدتين', 'وحدات')}
                                                 </span>
                                                 <span className="text-[12px] font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">{hotel.roomType || 'نوع الغرفة'}</span>
                                             </div>
@@ -1124,7 +1144,28 @@ export default function QuoteForm({
                                                 {hotelSuppliers.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
                                             </select>
                                         </div>
-                                        <div><label className="text-xs text-purple-600 font-bold">سعر التكلفة</label><input type="number" lang="en" dir="ltr" value={hotel.costPrice || ''} onChange={e => updateHotel(hotel.localId, 'costPrice', parseFloat(e.target.value) || 0)} className="w-full p-2 border-purple-200 border rounded font-bold text-purple-700 no-spin" /></div>
+                                        <div>
+                                            <label className="text-xs text-purple-600 font-bold mb-1 block">سعر التكلفة</label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    lang="en"
+                                                    dir="ltr"
+                                                    value={hotel.costPrice || ''}
+                                                    onChange={e => {
+                                                        const val = e.target.value.replace(/[^0-9.]/g, '');
+                                                        updateHotel(hotel.localId, 'costPrice', val ? parseFloat(val) : 0);
+                                                    }}
+                                                    className="w-full p-2 pl-8 border-purple-200 border rounded-lg font-bold text-purple-700 num-en h-[42px]"
+                                                    style={{ fontFamily: 'sans-serif' }}
+                                                    placeholder="0"
+                                                />
+                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 text-[10px] font-bold">
+                                                    <CurrencySymbol />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     {/* Done Button */}
                                     <div className="mt-6 flex justify-end pt-4 border-t border-gray-100">
@@ -1154,36 +1195,84 @@ export default function QuoteForm({
                 </div>
                 <div className="space-y-4">
                     {selectedServices.map(service => (
-                        <div key={service.localId} className="flex flex-col md:flex-row gap-4 items-end bg-gray-50 p-4 rounded-xl relative group">
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-xs font-medium text-gray-500 mb-1">نوع الخدمة</label>
-                                <select className="w-full p-2 border rounded-lg bg-white" onChange={e => updateService(service.localId, 'catalogId', e.target.value)} value={service.catalogId || ''}>
-                                    <option value="">-- اختر --</option>
-                                    {catalogServices.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
-                            </div>
-                            <div className="w-32">
-                                <label className="block text-orange-600 mb-1 font-bold text-[10px]">سعر التكلفة</label>
-                                <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    lang="en"
-                                    dir="ltr"
-                                    value={service.costPrice || ''}
-                                    onChange={e => {
-                                        const val = e.target.value.replace(/[^0-9.]/g, '');
-                                        updateService(service.localId, 'costPrice', val ? parseFloat(val) : 0);
-                                    }}
-                                    className="w-full p-2 border-orange-100 border rounded-lg text-orange-700 font-bold num-en"
-                                    style={{ fontFamily: 'sans-serif' }}
-                                />
-                            </div>
-                            <div className="w-24">
-                                <label className="block text-xs font-medium text-gray-500 mb-1">الكمية</label>
-                                <NumberInput value={service.quantity} onChange={val => updateService(service.localId, 'quantity', val)} />
-                            </div>
-                            <div className="w-32 pb-2 text-left font-bold text-gray-700 flex items-center justify-end gap-1">{service.costPrice.toLocaleString('en-US')}<CurrencySymbol className="w-3 h-3 text-gray-400" /></div>
-                            <button type="button" onClick={() => removeService(service.localId)} className="p-2 text-gray-400 hover:text-red-600 mb-0.5"><Trash2 size={18} /></button>
+                        <div key={service.localId} className={`rounded-xl transition-all duration-300 ${service.isCollapsed ? 'bg-white border hover:border-green-300 shadow-sm' : 'bg-gray-50 border border-gray-100 p-4 relative group'}`}>
+                            {service.isCollapsed ? (
+                                // Service Summary View (Green Card)
+                                <div className="p-4 cursor-pointer group bg-white hover:bg-green-50/20 transition-all duration-300 border-r-4 border-r-green-500 rounded-xl" onClick={() => updateService(service.localId, 'isCollapsed', false)}>
+                                    <div className="flex flex-col md:flex-row items-center gap-6">
+                                        <div className="md:w-1/3 flex flex-col items-start gap-1">
+                                            <div className="text-[16px] font-black text-gray-900 leading-tight">{service.name || 'اسم الخدمة'}</div>
+                                            <div className="text-xs text-green-600 font-bold">{service.supplier || 'بدون مورد'}</div>
+                                        </div>
+                                        <div className="flex-1 flex flex-col items-center justify-center">
+                                            <span className="bg-green-50 text-green-700 font-bold px-4 py-1 rounded-full text-[12px] border border-green-100 flex items-center gap-1">
+                                                {formatArabicUnit(service.quantity, 'كمية', 'كميتين', 'كميات')}
+                                            </span>
+                                        </div>
+                                        <div className="md:w-1/4 flex flex-col items-end gap-1 border-r border-gray-100 pr-4">
+                                            <div className="flex items-center gap-1 mt-1">
+                                                <span className="text-[20px] font-black text-green-600 font-sans">{Math.ceil(service.costPrice || 0).toLocaleString('en-US')}</span>
+                                                <span className="text-[10px] font-bold text-gray-400 underline decoration-green-200"><CurrencySymbol /></span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={(e) => { e.stopPropagation(); updateService(service.localId, 'isCollapsed', false) }} className="p-2 text-green-600 hover:bg-green-50 rounded-full transition"><Edit3 size={16} /></button>
+                                            <button onClick={(e) => { e.stopPropagation(); removeService(service.localId) }} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition"><Trash2 size={16} /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col md:flex-row gap-4 items-end relative">
+                                    <div className="flex-1 min-w-[200px]">
+                                        <label className="block text-xs font-medium text-gray-500 mb-1">نوع الخدمة</label>
+                                        <select className="w-full p-2 border rounded-lg bg-white h-[42px]" onChange={e => updateService(service.localId, 'catalogId', e.target.value)} value={service.catalogId || ''}>
+                                            <option value="">-- اختر --</option>
+                                            {catalogServices.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                        </select>
+                                    </div>
+                                    {/* Cost Price */}
+                                    <div className="w-32">
+                                        <label className="block text-xs font-medium text-gray-600 mb-1 font-bold">سعر التكلفة</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                inputMode="numeric"
+                                                lang="en"
+                                                dir="ltr"
+                                                value={service.costPrice || ''}
+                                                onChange={e => {
+                                                    const val = e.target.value.replace(/[^0-9.]/g, '');
+                                                    updateService(service.localId, 'costPrice', val ? parseFloat(val) : 0);
+                                                }}
+                                                className="w-full p-2 pl-8 border-green-200 border rounded-lg font-bold text-green-700 num-en h-[42px]"
+                                                style={{ fontFamily: 'sans-serif' }}
+                                                placeholder="0"
+                                            />
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 text-[10px] font-bold">
+                                                <CurrencySymbol />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* Quantity */}
+                                    <div className="w-24">
+                                        <label className="block text-xs font-medium text-gray-500 mb-1">الكمية</label>
+                                        <NumberInput value={service.quantity} onChange={val => updateService(service.localId, 'quantity', val)} />
+                                    </div>
+
+                                    {/* Done Button */}
+                                    <div className="flex items-center gap-2 pb-0.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => updateService(service.localId, 'isCollapsed', true)}
+                                            className="bg-green-600 text-white p-2.5 rounded-lg hover:bg-green-700 transition"
+                                            title="تم"
+                                        >
+                                            <CheckCircle2 size={18} />
+                                        </button>
+                                        <button type="button" onClick={() => removeService(service.localId)} className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100 transition"><Trash2 size={18} /></button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                     <div className="text-left font-bold text-gray-600 mt-2 flex items-center justify-end gap-1">إجمالي الخدمات: {totalServices.toLocaleString('en-US')}<CurrencySymbol className="w-4 h-4 text-gray-400" /></div>
