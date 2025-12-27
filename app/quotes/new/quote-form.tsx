@@ -887,56 +887,72 @@ export default function QuoteForm({
 
                             {hotel.isCollapsed ? (
                                 // Hotel Summary View (Purple Card)
-                                <div className="p-4 cursor-pointer group bg-white hover:bg-purple-50/30 transition-all duration-300 border-r-4 border-r-purple-500 rounded-xl" onClick={() => updateHotel(hotel.localId, 'isCollapsed', false)}>
+                                <div className="p-4 cursor-pointer group bg-white hover:bg-purple-50/20 transition-all duration-300 border-r-4 border-r-purple-500 rounded-xl" onClick={() => updateHotel(hotel.localId, 'isCollapsed', false)}>
                                     <div className="flex flex-col md:flex-row items-center gap-6">
 
                                         {/* 1. Right: Hotel Info */}
-                                        <div className="md:w-1/3 flex flex-col items-start gap-1">
+                                        <div className="md:w-1/4 flex flex-col items-start justify-center gap-1 border-l border-gray-100 pl-4 py-1">
                                             <div className="text-[16px] font-black text-gray-900 leading-tight">{hotel.hotelName || 'اسم الفندق'}</div>
-                                            <div className="text-sm text-gray-500 flex items-center gap-2">
+                                            <div className="text-xs text-gray-500 flex items-center gap-2 font-bold">
                                                 <MapPin size={12} className="text-purple-400" />
-                                                {hotel.city || 'المدينة'}
-                                                <div className="flex text-yellow-500 text-[10px]">
-                                                    {[...Array(hotel.stars || 0)].map((_, i) => <span key={i}>★</span>)}
-                                                </div>
+                                                <span>{hotel.city || 'المدينة'}</span>
+                                            </div>
+                                            <div className="flex text-yellow-500 text-[10px] mt-0.5">
+                                                {[...Array(hotel.stars || 0)].map((_, i) => <span key={i}>★</span>)}
                                             </div>
                                         </div>
 
                                         {/* 2. Middle: Dates & Duration */}
-                                        <div className="flex-1 w-full border-r border-r-dashed border-gray-200 pr-6 flex items-center justify-between gap-4">
-                                            <div className="text-center">
-                                                <div className="text-[14px] font-bold text-gray-800">{hotel.checkIn ? new Date(hotel.checkIn).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '--'}</div>
-                                                <div className="text-[10px] text-gray-400">دخول</div>
+                                        <div className="flex-1 w-full flex items-center justify-between gap-4 px-4">
+                                            <div className="text-center min-w-[90px]">
+                                                <div className="text-[18px] font-black text-gray-900 font-sans tracking-tight">
+                                                    {hotel.checkIn ? new Date(hotel.checkIn).toLocaleDateString('en-GB') : '--/--'}
+                                                </div>
+                                                <div className="text-[11px] text-gray-400 font-bold mt-0.5">دخول</div>
                                             </div>
-                                            <div className="flex-1 flex flex-col items-center relative">
-                                                <div className="h-[2px] w-full bg-purple-100 absolute top-1/2 -translate-y-1/2"></div>
-                                                <div className="z-10 bg-purple-50 text-purple-700 font-bold px-3 py-0.5 rounded-full text-[10px] shadow-sm border border-purple-100">
-                                                    {(() => {
-                                                        const s = hotel.checkIn ? new Date(hotel.checkIn) : null
-                                                        const e = hotel.checkOut ? new Date(hotel.checkOut) : null
-                                                        if (s && e) return Math.ceil((e.getTime() - s.getTime()) / (86400000)) + ' ليالي'
-                                                        return '--'
-                                                    })()}
+
+                                            <div className="flex-1 flex flex-col items-center justify-center relative px-2">
+                                                <div className="w-full border-b-2 border-dotted border-gray-200 absolute top-1/2"></div>
+                                                <div className="z-10 bg-white px-2">
+                                                    <div className="bg-purple-50 text-purple-700 font-bold px-3 py-0.5 rounded-full text-[11px] border border-purple-100 shadow-sm whitespace-nowrap">
+                                                        {(() => {
+                                                            const s = hotel.checkIn ? new Date(hotel.checkIn) : null
+                                                            const e = hotel.checkOut ? new Date(hotel.checkOut) : null
+                                                            if (s && e) return Math.ceil((e.getTime() - s.getTime()) / (86400000)) + ' ليالي'
+                                                            return '---'
+                                                        })()}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="text-center">
-                                                <div className="text-[14px] font-bold text-gray-800">{hotel.checkOut ? new Date(hotel.checkOut).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '--'}</div>
-                                                <div className="text-[10px] text-gray-400">خروج</div>
+
+                                            <div className="text-center min-w-[90px]">
+                                                <div className="text-[18px] font-black text-gray-900 font-sans tracking-tight">
+                                                    {hotel.checkOut ? new Date(hotel.checkOut).toLocaleDateString('en-GB') : '--/--'}
+                                                </div>
+                                                <div className="text-[11px] text-gray-400 font-bold mt-0.5">خروج</div>
                                             </div>
                                         </div>
 
                                         {/* 3. Left: Room & Price */}
-                                        <div className="md:w-1/4 flex flex-col items-end gap-1 border-r border-gray-100 pr-4">
-                                            <div className="text-[12px] font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">{hotel.roomType || 'نوع الغرفة'}</div>
-                                            <div className="text-[10px] text-gray-400">{hotel.mealPlan}</div>
-                                            <div className="text-lg font-black text-purple-600 flex items-center gap-0.5 mt-1">
-                                                {Math.ceil(hotel.price || 0).toLocaleString('en-US')}
-                                                <span className="text-[10px] font-normal text-gray-400">SAR</span>
+                                        <div className="md:w-1/4 flex flex-col items-end gap-2 border-r border-gray-100 pr-6">
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className="bg-purple-50 text-purple-700 text-[11px] font-bold px-2 py-0.5 rounded border border-purple-100">
+                                                    {hotel.roomCount || 1} {hotel.roomCount > 10 ? 'وحدة' : 'وحدات'}
+                                                </span>
+                                                <span className="text-[12px] font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">{hotel.roomType || 'نوع الغرفة'}</span>
                                             </div>
+
+                                            {hotel.costPrice > 0 && (
+                                                <div className="flex items-center gap-1 mt-1 group-hover:scale-105 transition-transform">
+                                                    <span className="text-[22px] font-black text-purple-600 font-sans">{Math.ceil(hotel.costPrice).toLocaleString('en-US')}</span>
+                                                    <span className="text-[12px] font-bold text-gray-400 underline decoration-purple-200 decoration-2 underline-offset-4"><CurrencySymbol /></span>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Actions */}
                                         <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={(e) => { e.stopPropagation(); updateHotel(hotel.localId, 'isCollapsed', false) }} className="p-2 text-purple-400 hover:text-purple-600 hover:bg-purple-50 rounded-full transition"><Edit3 size={16} /></button>
                                             <button onClick={(e) => { e.stopPropagation(); removeHotel(hotel.localId) }} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition"><Trash2 size={16} /></button>
                                         </div>
                                     </div>
