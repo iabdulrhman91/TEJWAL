@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toggleAirportStatus, deleteAirport } from './actions'
 import AddAirportModal from './AddAirportModal'
 import StatusBadge from '@/app/components/StatusBadge'
+import { Pencil } from 'lucide-react'
 
 interface Airport {
     id: number
@@ -18,6 +19,7 @@ export default function AirportTable({ initialAirports }: { initialAirports: Air
     const [airports, setAirports] = useState(initialAirports)
     const [searchTerm, setSearchTerm] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [editingAirport, setEditingAirport] = useState<Airport | null>(null)
 
     const filteredAirports = airports.filter(a =>
         a.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -44,6 +46,16 @@ export default function AirportTable({ initialAirports }: { initialAirports: Air
         }
     }
 
+    const handleEdit = (airport: Airport) => {
+        setEditingAirport(airport)
+        setIsModalOpen(true)
+    }
+
+    const handleAddNew = () => {
+        setEditingAirport(null)
+        setIsModalOpen(true)
+    }
+
     return (
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between gap-4">
@@ -55,7 +67,7 @@ export default function AirportTable({ initialAirports }: { initialAirports: Air
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleAddNew}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 justify-center"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,15 +105,24 @@ export default function AirportTable({ initialAirports }: { initialAirports: Air
                                     />
                                 </td>
                                 <td className="px-6 py-4 text-center">
-                                    <button
-                                        onClick={() => handleDelete(airport.id)}
-                                        className="text-red-500 hover:text-red-700 transition p-2"
-                                        title="حذف"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <button
+                                            onClick={() => handleEdit(airport)}
+                                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="تعديل"
+                                        >
+                                            <Pencil size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(airport.id)}
+                                            className="text-red-500 hover:text-red-700 transition p-2"
+                                            title="حذف"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -118,8 +139,13 @@ export default function AirportTable({ initialAirports }: { initialAirports: Air
             <AddAirportModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSuccess={(newAirport) => {
-                    setAirports(prev => [...prev, newAirport].sort((a, b) => a.code.localeCompare(b.code)))
+                initialData={editingAirport}
+                onSuccess={(savedAirport) => {
+                    if (editingAirport) {
+                        setAirports(prev => prev.map(a => a.id === savedAirport.id ? { ...savedAirport, isActive: a.isActive } : a))
+                    } else {
+                        setAirports(prev => [...prev, savedAirport].sort((a, b) => a.code.localeCompare(b.code)))
+                    }
                     setIsModalOpen(false)
                 }}
             />

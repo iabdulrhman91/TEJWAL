@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toggleHotelStatus, deleteHotel } from './actions'
-import { Star, Trash2, Search, Building2, Plus } from 'lucide-react'
+import { Star, Trash2, Search, Building2, Plus, Pencil } from 'lucide-react'
 import AddHotelModal from './AddHotelModal'
 import StatusBadge from '@/app/components/StatusBadge'
 
@@ -11,6 +11,7 @@ interface Hotel {
     name: string
     city: string
     stars: number
+    description: string | null
     isActive: boolean
 }
 
@@ -18,6 +19,7 @@ export default function HotelTable({ initialHotels }: { initialHotels: Hotel[] }
     const [hotels, setHotels] = useState(initialHotels)
     const [searchTerm, setSearchTerm] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [editingHotel, setEditingHotel] = useState<Hotel | null>(null)
 
     const filteredHotels = hotels.filter(h =>
         h.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -43,6 +45,16 @@ export default function HotelTable({ initialHotels }: { initialHotels: Hotel[] }
         }
     }
 
+    const handleEdit = (hotel: Hotel) => {
+        setEditingHotel(hotel)
+        setIsModalOpen(true)
+    }
+
+    const handleAddNew = () => {
+        setEditingHotel(null)
+        setIsModalOpen(true)
+    }
+
     return (
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between gap-4">
@@ -57,7 +69,7 @@ export default function HotelTable({ initialHotels }: { initialHotels: Hotel[] }
                     />
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleAddNew}
                     className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition flex items-center gap-2 justify-center shadow-lg shadow-purple-100"
                 >
                     <Plus size={20} />
@@ -104,13 +116,22 @@ export default function HotelTable({ initialHotels }: { initialHotels: Hotel[] }
                                     />
                                 </td>
                                 <td className="px-6 py-4 text-center">
-                                    <button
-                                        onClick={() => handleDelete(hotel.id)}
-                                        className="text-red-500 hover:text-red-700 transition p-2"
-                                        title="حذف"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <button
+                                            onClick={() => handleEdit(hotel)}
+                                            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                                            title="تعديل"
+                                        >
+                                            <Pencil size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(hotel.id)}
+                                            className="text-red-500 hover:text-red-700 transition p-2"
+                                            title="حذف"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -127,8 +148,13 @@ export default function HotelTable({ initialHotels }: { initialHotels: Hotel[] }
             <AddHotelModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                initialData={editingHotel}
                 onSuccess={(newHotel) => {
-                    setHotels(prev => [...prev, newHotel].sort((a, b) => a.name.localeCompare(b.name)))
+                    if (editingHotel) {
+                        setHotels(prev => prev.map(h => h.id === newHotel.id ? { ...newHotel, isActive: h.isActive } : h))
+                    } else {
+                        setHotels(prev => [...prev, newHotel].sort((a, b) => a.name.localeCompare(b.name)))
+                    }
                     setIsModalOpen(false)
                 }}
             />

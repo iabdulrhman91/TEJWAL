@@ -1,17 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { addHotel } from './actions'
+import { useState, useEffect } from 'react'
+import { addHotel, updateHotel } from './actions'
 import { Building2, X, Star } from 'lucide-react'
+
+interface HotelData {
+    id?: number
+    name: string
+    city: string
+    stars: number
+    description: string | null
+}
 
 export default function AddHotelModal({
     isOpen,
     onClose,
-    onSuccess
+    onSuccess,
+    initialData
 }: {
     isOpen: boolean,
     onClose: () => void,
-    onSuccess: (hotel: any) => void
+    onSuccess: (hotel: any) => void,
+    initialData?: HotelData | null
 }) {
     const [formData, setFormData] = useState({
         name: '',
@@ -22,6 +32,19 @@ export default function AddHotelModal({
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name,
+                city: initialData.city,
+                stars: initialData.stars,
+                description: initialData.description || ''
+            })
+        } else {
+            setFormData({ name: '', city: '', stars: 3, description: '' })
+        }
+    }, [initialData, isOpen])
+
     if (!isOpen) return null
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -30,15 +53,26 @@ export default function AddHotelModal({
         setError('')
 
         try {
-            const newHotel = await addHotel(formData)
-            onSuccess(newHotel)
-            setFormData({ name: '', city: '', stars: 3, description: '' })
+            let result;
+            if (initialData && initialData.id) {
+                result = await updateHotel(initialData.id, formData)
+            } else {
+                result = await addHotel(formData)
+            }
+            onSuccess(result)
+            if (!initialData) {
+                setFormData({ name: '', city: '', stars: 3, description: '' })
+            } else {
+                onClose()
+            }
         } catch (err: any) {
-            setError(err.message || 'حدث خطأ أثناء إضافة الفندق')
+            setError(err.message || 'حدث خطأ أثناء الحفظ')
         } finally {
             setLoading(false)
         }
     }
+
+    const isEdit = !!initialData
 
     return (
         <div className="fixed inset-0 bg-black/50 z-[60] flex justify-center items-center p-4 backdrop-blur-sm">
@@ -46,7 +80,7 @@ export default function AddHotelModal({
                 <div className="p-6 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                         <Building2 className="text-purple-600" size={24} />
-                        إضافة فندق جديد للمكتبة
+                        {isEdit ? 'تعديل بيانات الفندق' : 'إضافة فندق جديد للمكتبة'}
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
                         <X size={24} />
@@ -114,7 +148,7 @@ export default function AddHotelModal({
                             disabled={loading}
                             className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 transition disabled:opacity-50 shadow-lg shadow-purple-200"
                         >
-                            {loading ? 'جاري الإضافة...' : 'إضافة الفندق'}
+                            {loading ? 'جاري الحفظ...' : (isEdit ? 'حفظ التغييرات' : 'إضافة الفندق')}
                         </button>
                         <button
                             type="button"

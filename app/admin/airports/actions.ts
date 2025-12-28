@@ -51,6 +51,33 @@ export async function addAirport(data: { code: string, cityAr: string, cityEn: s
     revalidatePath('/admin/airports')
 }
 
+export async function updateAirport(id: number, data: { code: string, cityAr: string, cityEn: string, countryAr?: string }) {
+    await checkAdmin()
+
+    // Check if code exists for OTHER airports
+    const existing = await prisma.airport.findFirst({
+        where: {
+            code: data.code.toUpperCase(),
+            NOT: { id }
+        }
+    })
+
+    if (existing) {
+        throw new Error('رمز المطار (IATA) مستخدم بالفعل لمطار آخر')
+    }
+
+    await prisma.airport.update({
+        where: { id },
+        data: {
+            code: data.code.toUpperCase(),
+            cityAr: data.cityAr,
+            cityEn: data.cityEn,
+            countryAr: data.countryAr
+        }
+    })
+    revalidatePath('/admin/airports')
+}
+
 export async function deleteAirport(id: number) {
     await checkAdmin()
     await prisma.airport.delete({

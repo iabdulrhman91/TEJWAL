@@ -49,6 +49,32 @@ export async function addAirline(data: { code: string, nameAr: string, nameEn: s
     revalidatePath('/admin/airlines')
 }
 
+export async function updateAirline(id: number, data: { code: string, nameAr: string, nameEn: string }) {
+    await checkAdmin()
+
+    // Check if code exists for OTHER airlines
+    const existing = await prisma.airline.findFirst({
+        where: {
+            code: data.code.toUpperCase(),
+            NOT: { id }
+        }
+    })
+
+    if (existing) {
+        throw new Error('رمز الخطوط (IATA) مستخدم بالفعل لشركة أخرى')
+    }
+
+    await prisma.airline.update({
+        where: { id },
+        data: {
+            code: data.code.toUpperCase(),
+            nameAr: data.nameAr,
+            nameEn: data.nameEn
+        }
+    })
+    revalidatePath('/admin/airlines')
+}
+
 export async function deleteAirline(id: number) {
     await checkAdmin()
     await prisma.airline.delete({

@@ -75,3 +75,24 @@ export async function addHotel(data: { name: string, city: string, stars: number
     revalidatePath('/admin/hotels')
     return hotel
 }
+
+export async function updateHotel(id: number, data: { name: string, city: string, stars: number, description?: string }) {
+    const session = await getSession()
+    if (!session || session.role !== 'Admin') throw new Error('Unauthorized')
+
+    // Optional: Check unique constraints manually if needed, 
+    // but the composite unique index on (name, city) might handle it or Prisma will throw.
+    // For update, we might need to handle the unique constraint gracefully.
+
+    const hotel = await prisma.hotel.update({
+        where: { id },
+        data: {
+            name: data.name,
+            city: data.city,
+            stars: data.stars,
+            description: data.description
+        }
+    })
+    revalidatePath('/admin/hotels')
+    return hotel
+}

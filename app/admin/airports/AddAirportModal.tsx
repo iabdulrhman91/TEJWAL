@@ -1,16 +1,26 @@
 'use client'
 
-import { useState } from 'react'
-import { addAirport } from './actions'
+import { useState, useEffect } from 'react'
+import { addAirport, updateAirport } from './actions'
+
+interface AirportData {
+    id?: number
+    code: string
+    cityAr: string
+    cityEn: string
+    countryAr: string | null
+}
 
 export default function AddAirportModal({
     isOpen,
     onClose,
-    onSuccess
+    onSuccess,
+    initialData
 }: {
     isOpen: boolean,
     onClose: () => void,
-    onSuccess: (airport: any) => void
+    onSuccess: (airport: any) => void,
+    initialData?: AirportData | null
 }) {
     const [formData, setFormData] = useState({
         code: '',
@@ -21,6 +31,19 @@ export default function AddAirportModal({
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                code: initialData.code,
+                cityAr: initialData.cityAr,
+                cityEn: initialData.cityEn,
+                countryAr: initialData.countryAr || ''
+            })
+        } else {
+            setFormData({ code: '', cityAr: '', cityEn: '', countryAr: '' })
+        }
+    }, [initialData, isOpen])
+
     if (!isOpen) return null
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -29,21 +52,30 @@ export default function AddAirportModal({
         setError('')
 
         try {
-            const result = await addAirport(formData)
-            onSuccess({ ...formData, id: Math.random(), isActive: true }) // Simplified for UI update
-            setFormData({ code: '', cityAr: '', cityEn: '', countryAr: '' })
+            if (initialData && initialData.id) {
+                await updateAirport(initialData.id, formData)
+                onSuccess({ ...formData, id: initialData.id, isActive: true })
+            } else {
+                await addAirport(formData)
+                onSuccess({ ...formData, id: Math.random(), isActive: true })
+            }
+            onClose()
         } catch (err: any) {
-            setError(err.message || 'حدث خطأ أثناء إضافة المطار')
+            setError(err.message || 'حدث خطأ أثناء الحفظ')
         } finally {
             setLoading(false)
         }
     }
 
+    const isEdit = !!initialData
+
     return (
         <div className="fixed inset-0 bg-black/50 z-[60] flex justify-center items-center p-4 backdrop-blur-sm">
             <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200">
                 <div className="p-6 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
-                    <h2 className="text-xl font-bold text-gray-900">إضافة مطار جديد</h2>
+                    <h2 className="text-xl font-bold text-gray-900">
+                        {isEdit ? 'تعديل بيانات المطار' : 'إضافة مطار جديد'}
+                    </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -53,7 +85,7 @@ export default function AddAirportModal({
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {error && (
-                        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100">
+                        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100 italic">
                             {error}
                         </div>
                     )}
@@ -113,7 +145,7 @@ export default function AddAirportModal({
                             disabled={loading}
                             className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-lg shadow-blue-200"
                         >
-                            {loading ? 'جاري الإضافة...' : 'إضافة المطار'}
+                            {loading ? 'جاري الحفظ...' : (isEdit ? 'حفظ التغييرات' : 'إضافة المطار')}
                         </button>
                         <button
                             type="button"
