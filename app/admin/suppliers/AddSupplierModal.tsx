@@ -1,20 +1,41 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, X, Check, Building2, Plane, Hotel } from 'lucide-react'
-import { createSupplier } from './actions'
+import { createSupplier, updateSupplier } from './actions'
+
+interface SupplierData {
+    id: number
+    name: string
+    supportsFlights: boolean
+    supportsHotels: boolean
+    supportsServices: boolean
+}
 
 interface AddSupplierModalProps {
     isOpen: boolean
     onClose: () => void
     onSuccess?: () => void
+    initialData?: SupplierData | null
 }
 
-export default function AddSupplierModal({ isOpen, onClose, onSuccess }: AddSupplierModalProps) {
+export default function AddSupplierModal({ isOpen, onClose, onSuccess, initialData }: AddSupplierModalProps) {
     const [name, setName] = useState('')
     const [supportsFlights, setSupportsFlights] = useState(false)
     const [supportsHotels, setSupportsHotels] = useState(false)
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (initialData) {
+            setName(initialData.name)
+            setSupportsFlights(initialData.supportsFlights)
+            setSupportsHotels(initialData.supportsHotels)
+        } else {
+            setName('')
+            setSupportsFlights(false)
+            setSupportsHotels(false)
+        }
+    }, [initialData, isOpen])
 
     if (!isOpen) return null
 
@@ -22,17 +43,28 @@ export default function AddSupplierModal({ isOpen, onClose, onSuccess }: AddSupp
         e.preventDefault()
         setLoading(true)
         try {
-            await createSupplier({
-                name,
-                supportsFlights,
-                supportsHotels,
-                supportsServices: false
-            })
+            if (initialData) {
+                await updateSupplier(initialData.id, {
+                    name,
+                    supportsFlights,
+                    supportsHotels,
+                    supportsServices: initialData.supportsServices // Preserve existing value or add field if needed
+                })
+            } else {
+                await createSupplier({
+                    name,
+                    supportsFlights,
+                    supportsHotels,
+                    supportsServices: false
+                })
+            }
             onSuccess?.()
             onClose()
-            setName('')
-            setSupportsFlights(false)
-            setSupportsHotels(false)
+            if (!initialData) {
+                setName('')
+                setSupportsFlights(false)
+                setSupportsHotels(false)
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -40,13 +72,15 @@ export default function AddSupplierModal({ isOpen, onClose, onSuccess }: AddSupp
         }
     }
 
+    const isEdit = !!initialData
+
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
             <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                         <Building2 className="text-blue-600" />
-                        إضافة مورد جديد
+                        {isEdit ? 'تعديل بيانات المورد' : 'إضافة مورد جديد'}
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors">
                         <X size={20} />
@@ -89,7 +123,7 @@ export default function AddSupplierModal({ isOpen, onClose, onSuccess }: AddSupp
                             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={20} />}
-                            حفظ المورد
+                            {isEdit ? 'حفظ التغييرات' : 'حفظ المورد'}
                         </button>
                         <button
                             type="button"

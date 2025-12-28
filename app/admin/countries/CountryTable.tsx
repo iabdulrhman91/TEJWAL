@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Edit2, Trash2, CheckCircle, XCircle, Loader2, Plus } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle, XCircle, Loader2, Plus, Pencil } from 'lucide-react'
 import AddCountryModal from './AddCountryModal'
 import StatusBadge from '@/app/components/StatusBadge'
 import { deleteCountry, toggleCountryStatus } from './actions'
@@ -27,6 +27,7 @@ export default function CountryTable({ countries }: CountryTableProps) {
     const [searchTerm, setSearchTerm] = useState('')
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [loadingId, setLoadingId] = useState<number | null>(null)
+    const [editingCountry, setEditingCountry] = useState<Country | null>(null)
 
     const filtered = countries.filter(c =>
         c.nameAr.includes(searchTerm) ||
@@ -59,6 +60,16 @@ export default function CountryTable({ countries }: CountryTableProps) {
         }
     }
 
+    const handleEdit = (country: Country) => {
+        setEditingCountry(country)
+        setIsAddModalOpen(true)
+    }
+
+    const handleAddNew = () => {
+        setEditingCountry(null)
+        setIsAddModalOpen(true)
+    }
+
     return (
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between gap-4">
@@ -71,7 +82,7 @@ export default function CountryTable({ countries }: CountryTableProps) {
                 />
 
                 <button
-                    onClick={() => setIsAddModalOpen(true)}
+                    onClick={handleAddNew}
                     className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm justify-center"
                 >
                     <Plus size={18} />
@@ -104,6 +115,13 @@ export default function CountryTable({ countries }: CountryTableProps) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                                     <button
+                                        onClick={() => handleEdit(country)}
+                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="تعديل"
+                                    >
+                                        <Pencil size={16} />
+                                    </button>
+                                    <button
                                         onClick={() => handleDelete(country.id)}
                                         disabled={loadingId === country.id}
                                         title="حذف"
@@ -122,6 +140,7 @@ export default function CountryTable({ countries }: CountryTableProps) {
             <AddCountryModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
+                initialData={editingCountry}
                 onSuccess={() => router.refresh()}
             />
         </div>

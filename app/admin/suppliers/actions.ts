@@ -39,6 +39,30 @@ export async function createSupplier(data: {
     }
 }
 
+export async function updateSupplier(id: number, data: {
+    name: string,
+    supportsFlights: boolean,
+    supportsHotels: boolean,
+    supportsServices: boolean
+}) {
+    try {
+        await prisma.supplier.update({
+            where: { id },
+            data: {
+                name: data.name,
+                supportsFlights: data.supportsFlights,
+                supportsHotels: data.supportsHotels,
+                supportsServices: data.supportsServices
+            }
+        })
+        revalidatePath('/admin/suppliers')
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating supplier:', error)
+        return { success: false, error: 'Failed to update supplier' }
+    }
+}
+
 export async function toggleSupplierStatus(id: number, isActive: boolean) {
     try {
         await prisma.supplier.update({

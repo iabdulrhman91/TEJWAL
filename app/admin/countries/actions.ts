@@ -29,7 +29,7 @@ export async function getAllCountries() {
 }
 
 // Create or update a country (for "add new" feature)
-export async function createCountry(nameAr: string, code?: string) {
+export async function createCountry(nameAr: string, code?: string, nameEn?: string) {
     const session = await getSession()
     if (!session) throw new Error('Unauthorized')
 
@@ -60,9 +60,32 @@ export async function createCountry(nameAr: string, code?: string) {
     return await prisma.country.create({
         data: {
             nameAr,
-            nameEn: nameAr, // Fallback
+            nameEn: nameEn || nameAr, // Use provided nameEn or fallback
             code: finalCode,
             isActive: true
+        }
+    })
+}
+
+export async function updateCountry(id: number, data: { nameAr: string, nameEn: string, code: string }) {
+    const session = await getSession()
+    if (!session || session.role !== 'Admin') throw new Error('Unauthorized')
+
+    // Check if code exists for other countries
+    const existingByCode = await prisma.country.findFirst({
+        where: {
+            code: data.code.toUpperCase(),
+            id: { not: id }
+        }
+    })
+    if (existingByCode) throw new Error('الكود مستخدم بالفعل')
+
+    return await prisma.country.update({
+        where: { id },
+        data: {
+            nameAr: data.nameAr,
+            nameEn: data.nameEn,
+            code: data.code.toUpperCase()
         }
     })
 }

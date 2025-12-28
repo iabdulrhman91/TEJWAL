@@ -2,16 +2,26 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Edit2, Trash2, CheckCircle, XCircle, Plane, Hotel, Loader2, Plus, Search } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle, XCircle, Plane, Hotel, Loader2, Plus, Search, Pencil } from 'lucide-react'
 import { toggleSupplierStatus, deleteSupplier } from './actions'
 import AddSupplierModal from './AddSupplierModal'
 import StatusBadge from '@/app/components/StatusBadge'
 
-export default function SupplierTable({ initialSuppliers }: { initialSuppliers: any[] }) {
+interface Supplier {
+    id: number
+    name: string
+    supportsFlights: boolean
+    supportsHotels: boolean
+    supportsServices: boolean
+    isActive: boolean
+}
+
+export default function SupplierTable({ initialSuppliers }: { initialSuppliers: Supplier[] }) {
     const router = useRouter()
     const [loadingId, setLoadingId] = useState<number | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+    const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
 
     // Use initialSuppliers directly
     const suppliers = initialSuppliers
@@ -53,6 +63,16 @@ export default function SupplierTable({ initialSuppliers }: { initialSuppliers: 
         }
     }
 
+    const handleEdit = (supplier: Supplier) => {
+        setEditingSupplier(supplier)
+        setIsAddModalOpen(true)
+    }
+
+    const handleAddNew = () => {
+        setEditingSupplier(null)
+        setIsAddModalOpen(true)
+    }
+
     return (
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between gap-4">
@@ -67,7 +87,7 @@ export default function SupplierTable({ initialSuppliers }: { initialSuppliers: 
                     <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
                 </div>
                 <button
-                    onClick={() => setIsAddModalOpen(true)}
+                    onClick={handleAddNew}
                     className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm justify-center"
                 >
                     <Plus size={18} />
@@ -116,6 +136,13 @@ export default function SupplierTable({ initialSuppliers }: { initialSuppliers: 
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                                     <button
+                                        onClick={() => handleEdit(supplier)}
+                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="تعديل"
+                                    >
+                                        <Pencil size={16} />
+                                    </button>
+                                    <button
                                         onClick={() => handleDelete(supplier.id)}
                                         disabled={loadingId === supplier.id}
                                         className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition disabled:opacity-50"
@@ -140,6 +167,7 @@ export default function SupplierTable({ initialSuppliers }: { initialSuppliers: 
             <AddSupplierModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
+                initialData={editingSupplier}
                 onSuccess={() => {
                     setIsAddModalOpen(false)
                     router.refresh()
