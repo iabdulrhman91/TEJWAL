@@ -90,7 +90,7 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                     </div>
 
                     {/* Info Bar */}
-                    <div className="bg-gray-50 px-10 py-3 flex justify-between items-center border-y border-gray-200 mb-5">
+                    <div className="bg-blue-50 px-10 py-3 flex justify-between items-center border-y border-blue-200 mb-5">
                         <div className="flex gap-8">
                             <div className="flex flex-col">
                                 <span className="text-[9px] text-gray-500 font-bold mb-0.5">العميل</span>
