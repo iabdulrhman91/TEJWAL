@@ -3,6 +3,7 @@
 import { useState, useTransition, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Save, Plane, Building2, Calendar, MapPin, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Edit3, CheckCircle2, PlaneTakeoff, PlaneLanding, Send } from 'lucide-react'
+import { differenceInCalendarDays } from 'date-fns'
 import { createQuote, updateQuote } from '../actions'
 import AirportAutocomplete from '@/app/components/AirportAutocomplete'
 import AirlineAutocomplete from '@/app/components/AirlineAutocomplete'
@@ -1272,7 +1273,7 @@ export default function QuoteForm({
                                                     const start = toDate(hotel.checkIn)
                                                     const end = toDate(hotel.checkOut)
                                                     if (start && end) {
-                                                        const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+                                                        const diff = differenceInCalendarDays(end, start)
                                                         if (diff > 0) return (
                                                             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 font-bold text-[10px] bg-blue-50 px-2 py-0.5 rounded-full z-20 pointer-events-none border border-blue-100 shadow-sm">
                                                                 {diff} ليالي

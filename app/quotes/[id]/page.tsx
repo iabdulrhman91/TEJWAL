@@ -9,6 +9,7 @@ import AuditLogList from './AuditLogList'
 import CurrencySymbol from '@/app/components/CurrencySymbol'
 import QuoteActionsClient from './QuoteActionsClient'
 import AutoPrint from '@/app/components/AutoPrint'
+import { differenceInCalendarDays } from 'date-fns'
 
 export default async function QuoteDetailsPage({ params, searchParams }: { params: { id: string }, searchParams?: { print?: string } }) {
     const rawQuote = await getQuote(parseInt(params.id))
@@ -133,7 +134,7 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                                             <th className="p-2 rounded-r-md">خط السير</th>
                                             <th className="p-2">شركة الطيران</th>
                                             <th className="p-2">المغادرة / الوصول</th>
-                                            <th className="p-2 rounded-l-md">الدرجة / الوزن / العدد</th>
+                                            <th className="p-2 rounded-l-md whitespace-nowrap">الدرجة / الوزن / العدد</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -169,10 +170,10 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                                                     {/* Outbound Row */}
                                                     <tr className="border-b border-gray-100">
                                                         {/* Route Cell */}
-                                                        <td className="p-3 w-[40%] align-middle">
+                                                        <td className="p-3 w-[35%] align-middle">
                                                             {/* Date */}
                                                             <div className="text-[11px] font-bold text-gray-800 mb-1 text-right">
-                                                                {seg.departureDateTime ? new Date(seg.departureDateTime).toLocaleDateString('ar-SA', dateOpts) : ''}
+                                                                {seg.departureDateTime ? new Date(seg.departureDateTime).toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }) : ''}
                                                             </div>
                                                             <div className="flex items-center justify-start gap-0">
                                                                 <span className="font-bold text-[13px] text-gray-800 w-[60px] text-right truncate">
@@ -209,20 +210,20 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                                                         <td className="p-3 w-[25%] align-middle text-right">
                                                             <div className="flex justify-start gap-2 mb-1" dir="rtl">
                                                                 <span className="text-[10px] text-gray-500 w-[40px] shrink-0">إقلاع:</span>
-                                                                <span className="font-bold text-gray-800" dir="ltr">
-                                                                    {seg.departureDateTime ? new Date(seg.departureDateTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '---'}
+                                                                <span className="font-bold text-gray-800">
+                                                                    {seg.departureDateTime ? new Date(seg.departureDateTime).toLocaleTimeString('ar-EG-u-nu-latn', { hour: '2-digit', minute: '2-digit' }) : '---'}
                                                                 </span>
                                                             </div>
                                                             <div className="flex justify-start gap-2" dir="rtl">
                                                                 <span className="text-[10px] text-gray-500 w-[40px] shrink-0">وصول:</span>
-                                                                <span className="font-bold text-gray-800" dir="ltr">
-                                                                    {seg.arrivalDateTime ? new Date(seg.arrivalDateTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '---'}
+                                                                <span className="font-bold text-gray-800">
+                                                                    {seg.arrivalDateTime ? new Date(seg.arrivalDateTime).toLocaleTimeString('ar-EG-u-nu-latn', { hour: '2-digit', minute: '2-digit' }) : '---'}
                                                                 </span>
                                                             </div>
                                                         </td>
 
                                                         {/* Class/Weight */}
-                                                        <td className="p-3 w-[15%] align-middle">
+                                                        <td className="p-3 w-[20%] align-middle">
                                                             <div className="font-semibold mb-1">{seg.cabinClass === 'Business' ? 'رجال أعمال' : 'سياحية'}</div>
                                                             <div className="text-[10px] text-gray-500" dir="rtl">
                                                                 {seg.weight ? `${seg.weight} كجم` : '23 كجم'}
@@ -235,10 +236,10 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                                                     {/* Return Row (if exists) */}
                                                     {seg.returnDepartureDateTime && (
                                                         <tr className="border-b border-gray-100 bg-blue-50/30">
-                                                            <td className="p-3 w-[40%] align-middle">
+                                                            <td className="p-3 w-[35%] align-middle">
                                                                 {/* Date */}
                                                                 <div className="text-[11px] font-bold text-gray-800 mb-1 text-right">
-                                                                    {new Date(seg.returnDepartureDateTime).toLocaleDateString('ar-SA', dateOpts)}
+                                                                    {new Date(seg.returnDepartureDateTime).toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' })}
                                                                 </div>
                                                                 <div className="flex items-center justify-start gap-0">
                                                                     <span className="font-bold text-[13px] text-gray-800 w-[60px] text-right truncate">
@@ -273,19 +274,19 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                                                             <td className="p-3 w-[25%] align-middle text-right">
                                                                 <div className="flex justify-start gap-2 mb-1" dir="rtl">
                                                                     <span className="text-[10px] text-gray-500 w-[40px] shrink-0">إقلاع:</span>
-                                                                    <span className="font-bold text-gray-800" dir="ltr">
-                                                                        {new Date(seg.returnDepartureDateTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+                                                                    <span className="font-bold text-gray-800">
+                                                                        {new Date(seg.returnDepartureDateTime).toLocaleTimeString('ar-EG-u-nu-latn', { hour: '2-digit', minute: '2-digit' })}
                                                                     </span>
                                                                 </div>
                                                                 <div className="flex justify-start gap-2" dir="rtl">
                                                                     <span className="text-[10px] text-gray-500 w-[40px] shrink-0">وصول:</span>
-                                                                    <span className="font-bold text-gray-800" dir="ltr">
-                                                                        {seg.returnArrivalDateTime ? new Date(seg.returnArrivalDateTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '---'}
+                                                                    <span className="font-bold text-gray-800">
+                                                                        {seg.returnArrivalDateTime ? new Date(seg.returnArrivalDateTime).toLocaleTimeString('ar-EG-u-nu-latn', { hour: '2-digit', minute: '2-digit' }) : '---'}
                                                                     </span>
                                                                 </div>
                                                             </td>
 
-                                                            <td className="p-3 w-[15%] align-middle">
+                                                            <td className="p-3 w-[20%] align-middle">
                                                                 <div className="font-semibold mb-1">{(seg.returnCabinClass || seg.cabinClass) === 'Business' ? 'رجال أعمال' : 'سياحية'}</div>
                                                                 <div className="text-[10px] text-gray-500" dir="rtl">
                                                                     {seg.returnWeight ? `${seg.returnWeight} كجم` : (seg.weight ? `${seg.weight} كجم` : '23 كجم')}
@@ -308,7 +309,8 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                             <div className="mb-5">
                                 <h3 className="text-sm font-bold mb-2 pb-1 border-b-2 border-gray-200 text-blue-800">الفنادق والإقامة</h3>
                                 {quote.hotelStays.map((stay: any) => {
-                                    const nights = stay.nights || (stay.checkInDate && stay.checkOutDate ? Math.ceil((new Date(stay.checkOutDate).getTime() - new Date(stay.checkInDate).getTime()) / (1000 * 60 * 60 * 24)) : 1);
+                                    const calculatedNights = (stay.checkInDate && stay.checkOutDate) ? Math.max(0, differenceInCalendarDays(new Date(stay.checkOutDate), new Date(stay.checkInDate))) : 0;
+                                    const nights = calculatedNights > 0 ? calculatedNights : (stay.nights || 1);
 
                                     return (
                                         <div key={stay.id} className="flex justify-between items-start p-2.5 bg-gray-50 rounded-md mb-1.5 border-b border-gray-100 break-inside-avoid">
@@ -394,13 +396,13 @@ export default async function QuoteDetailsPage({ params, searchParams }: { param
                 
                 @media print {
                     @page { 
-                        margin: 20mm 0 10mm 0; /* Top Bottom only - No side margins to prevent squashing */
+                        margin: 10mm 0 10mm 0;
                         size: A4; 
                     }
                     @page :first {
-                        margin-top: 0; /* Keep first page header at top */
+                        margin-top: 0;
                     }
-                    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: white; }
+                    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: white; margin: 0 !important; padding: 0 !important; }
 
                     /* HIDE UI ELEMENTS */
                     nav, header, aside, .sidebar, .navbar, .no-print { display: none !important; }
