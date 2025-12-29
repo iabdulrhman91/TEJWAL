@@ -125,9 +125,16 @@ model FlightSegment {
   
   airline           String
   flightType        String   @default("OneWay") // OneWay, RoundTrip, Multi
+  cabinClass        String   @default("Economy") // Economy, Business, First
+  returnCabinClass  String?
+  weight            String?  // e.g. "23kg"
+  returnWeight      String?  // e.g. "2x23kg"
   baggageKg         Int      @default(23)
   
   ticketCount       Int      @default(1)
+  
+  stopoverTime      Float?   // Waiting time in hours
+  returnStopoverTime Float?
   
   // Pricing
   supplier          String?  // e.g. "Amadeus", "Direct"

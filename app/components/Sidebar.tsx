@@ -25,7 +25,7 @@ export default async function Sidebar() {
         { label: 'العروض', href: '/quotes', icon: FileText, group: 'الأساسية' },
         { label: 'التقارير', href: '/dashboard', icon: LayoutDashboard, group: 'الأساسية', adminOnly: true },
 
-        { label: 'الخدمات', href: '/services', icon: Briefcase, group: 'مكونات الرحلة' },
+        { label: 'الخدمات', href: '/services', icon: Briefcase, group: 'مكونات الرحلة', adminOnly: true },
         { label: 'المطارات', href: '/admin/airports', icon: MapPin, group: 'مكونات الرحلة', adminOnly: true },
         { label: 'الطيران', href: '/admin/airlines', icon: Plane, group: 'مكونات الرحلة', adminOnly: true },
         { label: 'الفنادق', href: '/admin/hotels', icon: Hotel, group: 'مكونات الرحلة', adminOnly: true },

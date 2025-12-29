@@ -23,7 +23,8 @@ export async function getActiveSuppliers(type: 'flight' | 'hotel' | 'service') {
 export async function getQuotes(
     query?: string,
     filterStatus?: string,
-    filterDate?: string
+    filterDate?: string,
+    filterCreator?: string
 ) {
     const where: any = {}
 
@@ -42,7 +43,15 @@ export async function getQuotes(
         where.status = filterStatus
     }
 
-    // 3. Date Filter
+    // 3. Creator Filter (My Quotes)
+    if (filterCreator === 'me') {
+        const session = await getSession()
+        if (session) {
+            where.createdByUserId = session.id
+        }
+    }
+
+    // 4. Date Filter
     if (filterDate && filterDate !== 'All') {
         const now = new Date()
         let startDate: Date
@@ -61,7 +70,7 @@ export async function getQuotes(
                 startDate = firstDayOfMonth
                 break
             default:
-                startDate = new Date(0) // Should not happen if UI is correct
+                startDate = new Date(0)
         }
 
         where.createdAt = { gte: startDate }
@@ -71,6 +80,13 @@ export async function getQuotes(
         where,
         orderBy: { createdAt: 'desc' },
         take: 20, // Pagination limit
+        include: {
+            createdBy: {
+                select: {
+                    name: true
+                }
+            }
+        }
     })
 }
 
@@ -106,8 +122,13 @@ export async function deleteQuote(id: number) {
 // Status Actions
 export async function approveQuote(id: number) {
     const session = await getSession()
-    if (!session || session.role !== 'Admin') {
-        throw new Error('Unauthorized: Admin only')
+    if (!session) throw new Error('Unauthorized')
+
+    const quote = await prisma.quote.findUnique({ where: { id } })
+    if (!quote) throw new Error('Quote not found')
+
+    if (session.role !== 'Admin' && quote.createdByUserId !== session.id) {
+        throw new Error('Unauthorized: Admin or Owner only')
     }
 
     await prisma.quote.update({
@@ -119,6 +140,8 @@ export async function approveQuote(id: number) {
     })
     revalidatePath(`/quotes/${id}`)
 
+
+
     await createAuditLog({
         action: 'APPROVE_QUOTE',
         userId: session.id,
@@ -126,10 +149,43 @@ export async function approveQuote(id: number) {
     })
 }
 
+export async function revertToDraft(id: number) {
+    const session = await getSession()
+    if (!session) throw new Error('Unauthorized')
+
+    const quote = await prisma.quote.findUnique({ where: { id } })
+    if (!quote) throw new Error('Quote not found')
+
+    if (session.role !== 'Admin' && quote.createdByUserId !== session.id) {
+        throw new Error('Unauthorized: Admin or Owner only')
+    }
+
+    await prisma.quote.update({
+        where: { id },
+        data: {
+            status: 'Draft',
+            // We keep approvedAt/sentAt as history or clear them? 
+            // Better to keep them in audit log, but here maybe just status change.
+        }
+    })
+    revalidatePath(`/quotes/${id}`)
+
+    await createAuditLog({
+        action: 'REVERT_TO_DRAFT',
+        userId: session.id,
+        quoteId: id
+    })
+}
+
 export async function cancelQuote(id: number) {
     const session = await getSession()
-    if (!session || session.role !== 'Admin') {
-        throw new Error('Unauthorized: Admin only')
+    if (!session) throw new Error('Unauthorized')
+
+    const quote = await prisma.quote.findUnique({ where: { id } })
+    if (!quote) throw new Error('Quote not found')
+
+    if (session.role !== 'Admin' && quote.createdByUserId !== session.id) {
+        throw new Error('Unauthorized: Admin or Owner only')
     }
 
     await prisma.quote.update({
@@ -143,6 +199,33 @@ export async function cancelQuote(id: number) {
 
     await createAuditLog({
         action: 'CANCEL_QUOTE',
+        userId: session.id,
+        quoteId: id
+    })
+}
+
+export async function markAsSent(id: number) {
+    const session = await getSession()
+    if (!session) throw new Error('Unauthorized')
+
+    const quote = await prisma.quote.findUnique({ where: { id } })
+    if (!quote) throw new Error('Quote not found')
+
+    if (session.role !== 'Admin' && quote.createdByUserId !== session.id) {
+        throw new Error('Unauthorized')
+    }
+
+    await prisma.quote.update({
+        where: { id },
+        data: {
+            status: 'Sent',
+            sentAt: new Date()
+        }
+    })
+    revalidatePath(`/quotes/${id}`)
+
+    await createAuditLog({
+        action: 'SEND_QUOTE',
         userId: session.id,
         quoteId: id
     })
@@ -195,8 +278,16 @@ export async function createQuote(data: any) {
         selectedServices,
         flights,
         hotels,
-        markup
+        markup,
+        status // Extract status
     } = data
+
+    if (!customerName?.trim() || !customerPhone?.trim()) {
+        throw new Error('الاسم ورقم الجوال حقول إلزامية')
+    }
+    if (!destination || (Array.isArray(destination) && destination.length === 0)) {
+        throw new Error('الوجهة حقل إلزامي')
+    }
 
     // Find or create customer
     const { findOrCreateCustomer } = require('@/app/customers/actions')
@@ -247,7 +338,8 @@ export async function createQuote(data: any) {
             totalHotels,
             markup: quoteMarkup,
             grandTotal,
-            status: 'Draft',
+            status: status || 'Draft',
+            sentAt: status === 'Sent' ? new Date() : null,
             createdByUserId: session.id,
             quoteServices: {
                 create: (selectedServices || []).map((s: any) => ({
@@ -273,8 +365,14 @@ export async function createQuote(data: any) {
                     returnDepartureDateTime: f.returnDeparture ? new Date(f.returnDeparture) : null,
                     returnArrivalDateTime: f.returnArrival ? new Date(f.returnArrival) : null,
                     returnAirline: f.returnAirline,
+                    returnCabinClass: f.returnCabinClass,
                     airline: f.airline,
                     flightType: f.flightType,
+                    cabinClass: f.cabinClass,
+                    weight: f.weight,
+                    returnWeight: f.returnWeight,
+                    stopoverTime: parseFloat(f.stopoverTime) || 0,
+                    returnStopoverTime: parseFloat(f.returnStopoverTime) || 0,
                     ticketCount: parseInt(f.ticketCount) || 1,
                     supplier: f.supplier,
                     costPrice: parseFloat(f.costPrice) || 0,
@@ -372,8 +470,16 @@ export async function updateQuote(id: number, data: any) {
         selectedServices,
         flights,
         hotels,
-        markup
+        markup,
+        status // Extract status
     } = data
+
+    if (!customerName?.trim() || !customerPhone?.trim()) {
+        throw new Error('الاسم ورقم الجوال حقول إلزامية')
+    }
+    if (!destination || (Array.isArray(destination) && destination.length === 0)) {
+        throw new Error('الوجهة حقل إلزامي')
+    }
 
     // Filter valid items
     const validFlights = (flights || []).filter((f: any) => f.from || f.to)
@@ -420,6 +526,8 @@ export async function updateQuote(id: number, data: any) {
             totalHotels,
             markup: quoteMarkup,
             grandTotal,
+            status: status || quote.status, // Update status if provided
+            sentAt: status === 'Sent' ? new Date() : quote.sentAt,
             // Delete all existing items
             quoteServices: {
                 deleteMany: {},
@@ -447,8 +555,14 @@ export async function updateQuote(id: number, data: any) {
                     returnDepartureDateTime: f.returnDeparture ? new Date(f.returnDeparture) : null,
                     returnArrivalDateTime: f.returnArrival ? new Date(f.returnArrival) : null,
                     returnAirline: f.returnAirline,
+                    returnCabinClass: f.returnCabinClass,
                     airline: f.airline,
                     flightType: f.flightType,
+                    cabinClass: f.cabinClass,
+                    weight: f.weight,
+                    returnWeight: f.returnWeight,
+                    stopoverTime: parseFloat(f.stopoverTime) || 0,
+                    returnStopoverTime: parseFloat(f.returnStopoverTime) || 0,
                     ticketCount: parseInt(f.ticketCount) || 1,
                     supplier: f.supplier,
                     costPrice: parseFloat(f.costPrice) || 0,
@@ -494,4 +608,46 @@ export async function updateQuote(id: number, data: any) {
     })
 
     return { success: true, id }
+}
+
+// -----------------------------------------------------------------------------
+// PDF.co Integration
+// -----------------------------------------------------------------------------
+export async function generatePdfWithPdfCo(htmlContent: string, filename: string = 'quote.pdf') {
+    const apiKey = process.env.PDF_CO_API_KEY
+    if (!apiKey) {
+        return { success: false, error: 'API Key Missing: Please add PDF_CO_API_KEY to your .env file.' }
+    }
+
+    try {
+        const response = await fetch('https://api.pdf.co/v1/pdf/convert/from/html', {
+            method: 'POST',
+            headers: {
+                'x-api-key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                html: htmlContent,
+                name: filename,
+                margins: "5px 5px 5px 5px",
+                paperSize: "A4",
+                orientation: "Portrait",
+                printBackground: true,
+                header: "",
+                footer: ""
+            })
+        })
+
+        const data = await response.json()
+
+        if (data.error) {
+            console.error('PDF.co Error:', data.message)
+            return { success: false, error: data.message }
+        }
+
+        return { success: true, url: data.url }
+    } catch (error) {
+        console.error('PDF.co Request Failed:', error)
+        return { success: false, error: 'Failed to connect to PDF service.' }
+    }
 }

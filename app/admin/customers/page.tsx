@@ -6,7 +6,7 @@ import CustomersTable from './CustomersTable'
 export default async function CustomersPage() {
     const session = await getSession()
 
-    if (!session || session.role !== 'Admin') {
+    if (!session) {
         redirect('/')
     }
 

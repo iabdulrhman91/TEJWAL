@@ -10,7 +10,7 @@ import CurrencySymbol from '@/app/components/CurrencySymbol'
 export default async function CustomerDetailsPage({ params }: { params: { id: string } }) {
     const session = await getSession()
 
-    if (!session || session.role !== 'Admin') {
+    if (!session) {
         redirect('/')
     }
 
@@ -110,8 +110,10 @@ export default async function CustomerDetailsPage({ params }: { params: { id: st
                         </div>
                     </div>
 
-                    {/* Edit Form */}
-                    <EditCustomerForm customer={customer} />
+                    {/* Edit Form - Admin Only */}
+                    {session.role === 'Admin' && (
+                        <EditCustomerForm customer={customer} />
+                    )}
                 </div>
 
                 {/* Quotes History */}

@@ -24,7 +24,7 @@
     "countryAr": "السعودية"
   },
   {
-    "code": "ABH",
+    "code": "AHB",
     "cityAr": "أبها",
     "cityEn": "Abha",
     "countryAr": "السعودية"
@@ -66,19 +66,19 @@
     "countryAr": "السعودية"
   },
   {
-    "code": "AHB",
+    "code": "ABT",
     "cityAr": "الباحة",
     "cityEn": "Al-Baha",
     "countryAr": "السعودية"
   },
   {
-    "code": "HOE",
-    "cityAr": "الحوف",
-    "cityEn": "Al-Jouf",
+    "code": "HOF",
+    "cityAr": "الأحساء",
+    "cityEn": "Al-Ahsa",
     "countryAr": "السعودية"
   },
   {
-    "code": "RAO",
+    "code": "RAE",
     "cityAr": "عرعر",
     "cityEn": "Arar",
     "countryAr": "السعودية"
@@ -96,7 +96,7 @@
     "countryAr": "السعودية"
   },
   {
-    "code": "GAY",
+    "code": "URY",
     "cityAr": "القريات",
     "cityEn": "Guriat",
     "countryAr": "السعودية"
@@ -141,12 +141,6 @@
     "code": "QOW",
     "cityAr": "القويعية",
     "cityEn": "Al-Quway'iyah",
-    "countryAr": "السعودية"
-  },
-  {
-    "code": "URA",
-    "cityAr": "أملج",
-    "cityEn": "Umluj",
     "countryAr": "السعودية"
   },
   {

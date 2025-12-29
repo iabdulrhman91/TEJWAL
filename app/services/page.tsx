@@ -1,9 +1,14 @@
+import { getSession } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 import { getServices } from './actions'
-import Link from 'next/link'
-import { Plus } from 'lucide-react'
 import ServicesTable from './ServicesTable'
 
 export default async function ServicesPage() {
+    const session = await getSession()
+    if (!session || session.role !== 'Admin') {
+        redirect('/quotes')
+    }
+
     const services = await getServices()
 
     return (

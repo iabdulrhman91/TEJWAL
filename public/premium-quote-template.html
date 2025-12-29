@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Offer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 210mm;
+            min-height: 297mm;
+            font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+            background-color: #fff;
+            color: #000;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-size: 12px;
+        }
+
+        /* UTILITIES */
+        .ltr {
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .text-blue {
+            color: #1e40af;
+        }
+
+        /* Darker blue */
+        .text-gray {
+            color: #4b5563;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-xs {
+            font-size: 10px;
+        }
+
+        .text-sm {
+            font-size: 11px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f3f4f6;
+            margin-bottom: 10px;
+            direction: rtl;
+            /* Ensure Right-to-Left Layout for Header Items */
+        }
+
+        .flight-airline {
+            width: 15%;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .flight-route-cell {
+            width: 45%;
+        }
+
+        .route-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Info (Right side in RTL) */
+        .header-info {
+            text-align: right;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+
+        .header-info div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .page-title {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .page-title h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #111827;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        /* Logo (Left side in RTL) */
+        /* Flex order: Info (start/right), Title (center), Logo (end/left) */
+        /* To achieve Logo Left, Info Right in RTL:
+           Item 1: Info (Right)
+           Item 2: Title
+           Item 3: Logo (Left)
+        */
+
+        .logo-section {
+            width: 150px;
+            text-align: left;
+            /* Align image to the left inside container */
+        }
+
+        .logo-section img {
+            max-width: 100%;
+            height: auto;
+            max-height: 90px;
+            /* Bigger Logo */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+
+        <!-- Info (Right) -->
+        <div class="header-info">
+            <div>
+                <span style="font-weight: 800; color: #000;">الفرع الرئيسي:</span>
+                <span>خميس مشيط</span>
+            </div>
+            <div>
+                <span style="font-weight: 800; color: #000;">هاتف:</span>
+                <span style="direction: ltr; unicode-bidi: embed;">0172227999</span>
+            </div>
+        </div>
+
+        <div class="page-title">
+            <h1>عرض السفر</h1>
+        </div>
+
+        <!-- Logo (Left) -->
+        <div class="logo-section">
+            <img src="{{companyLogo}}" alt="Tejwal Logo" />
+        </div>
+    </header>
+
+    <!-- Info Bar -->
+    <div class="info-bar">
+        <div class="info-group">
+            <div class="info-item">
+                <span class="info-label">العميل</span>
+                <span class="info-value">{{customerName}}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">المسافرين</span>
+                <span class="info-value">{{passengers}}</span>
+            </div>
+        </div>
+
+        <div class="info-group" style="text-align: left;">
+            <div class="info-item">
+                <span class="info-label">رقم العرض</span>
+                <span class="info-value ltr">#{{quoteNumber}}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">التاريخ</span>
+                <span class="info-value ltr">{{date}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Flights -->
+        {{#if flights.length}}
+        <div class="section">
+            <h3
+                style="font-size: 14px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; color: #1e40af;">
+                رحلات الطيران</h3>
+            <table class="flight-table" style="width: 100%; text-align: right;">
+                <thead style="background-color: #f3f4f6; font-weight: bold; font-size: 11px; color: #374151;">
+                    <tr>
+                        <th style="padding: 10px; border-radius: 6px 0 0 6px;">خط السير</th>
+                        <th style="padding: 10px;">شركة الطيران</th>
+                        <th style="padding: 10px;">المغادرة / الوصول</th>
+                        <th style="padding: 10px; border-radius: 0 6px 6px 0;">الدرجة / الوزن</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each flights}}
+                    <tr class="flight-row" style="border-bottom: 1px solid #f3f4f6;">
+                        <td class="flight-route-cell" style="width: 40%; padding: 12px 10px;">
+                            <!-- Date -->
+                            <div style="font-size: 11px; font-weight: bold; color: #1f2937; margin-bottom: 5px;">
+                                {{date}}</div>
+                            <div class="route-container"
+                                style="display: flex; align-items: center; justify-content: start; gap: 0;">
+                                <!-- Align Right for Departure City as requested -->
+                                <span class="city-code"
+                                    style="font-weight: 800; font-size: 14px; color: #1f2937; width: 60px; text-align: right;">{{from}}</span>
+
+                                <!-- Visual Route Line -->
+                                <div
+                                    style="display: flex; align-items: center; justify-content: center; position: relative; margin: 0 10px;">
+                                    <div style="width: 80px; height: 2px; background-color: #e5e7eb;"></div>
+                                    <!-- The Line -->
+                                    <div
+                                        style="position: absolute; color: #2563eb; font-size: 16px; transform: scaleX(-1); background: #fff; padding: 0 6px; display: flex; align-items: center; justify-content: center; height: 20px;">
+                                        ✈
+                                    </div> <!-- The Plane -->
+                                </div>
+
+                                <span class="city-code"
+                                    style="font-weight: 800; font-size: 14px; color: #1f2937; width: 60px; text-align: right;">{{to}}</span>
+                            </div>
+
+                            {{#if stops}}
+                            <div class="text-xs text-gray" style="margin-top: 8px;">
+                                <span
+                                    style="background: #eff6ff; color: #1d4ed8; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: bold;">{{stops}}</span>
+                            </div>
+                            {{/if}}
+                        </td>
+                        <td class="flight-airline" style="width: 20%; padding: 12px 10px;">
+                            <div style="font-weight: bold; color: #111827;">{{airline}}</div>
+                        </td>
+                        <td class="flight-times"
+                            style="width: 25%; padding: 12px 10px; text-align: right; vertical-align: middle;">
+                            <!-- Time Display: Aligned Right as requested -->
+                            <div style="display: flex; justify-content: start; gap: 8px; margin-bottom: 4px;" dir="rtl">
+                                <span
+                                    style="font-size: 10px; color: #6b7280; width: 40px; display: inline-block;">إقلاع:</span>
+                                <span style="font-weight: bold; color: #111827; direction: ltr;">{{departure}}</span>
+                            </div>
+                            <div style="display: flex; justify-content: start; gap: 8px;" dir="rtl">
+                                <span
+                                    style="font-size: 10px; color: #6b7280; width: 40px; display: inline-block;">وصول:</span>
+                                <span style="font-weight: bold; color: #111827; direction: ltr;">{{arrival}}</span>
+                            </div>
+                        </td>
+                        <td style="width: 15%; padding: 12px 10px;">
+                            <div style="font-weight: 600;">{{cabin}}</div>
+                            <!-- Weight: Removed 'ltr' class to ensure Arabic direction (Number then Unit) -->
+                            <div class="text-gray text-xs"
+                                style="margin-top: 4px; direction: rtl; unicode-bidi: embed;">{{weight}}</div>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        {{/if}}
+
+        <!-- Hotels -->
+        {{#if hotels.length}}
+        <div class="section">
+            <h3
+                style="font-size: 14px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; color: #1e40af;">
+                الفنادق والإقامة</h3>
+            {{#each hotels}}
+            <div class="hotel-row"
+                style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px; border-bottom: 1px solid #f3f4f6;">
+                <div class="hotel-main" style="display: flex; gap: 15px;">
+                    <div
+                        style="background: #fdf2f8; color: #db2777; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        🏨</div>
+                    <div>
+                        <div class="hotel-name" style="font-weight: bold; font-size: 13px; margin-bottom: 2px;">{{name}}
+                        </div>
+                        <div class="hotel-details" style="font-size: 11px; color: #6b7280; margin-bottom: 4px;">{{city}}
+                            | {{room}}</div>
+
+                        <!-- Dates -->
+                        <div style="font-size: 10px; color: #4b5563; margin-bottom: 4px;">
+                            <span style="font-weight: bold;">دخول:</span> <span class="ltr">{{checkIn}}</span>
+                            &nbsp;|&nbsp;
+                            <span style="font-weight: bold;">خروج:</span> <span class="ltr">{{checkOut}}</span>
+                        </div>
+
+                        <!-- Stars & Units -->
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            {{#if stars}}
+                            <div style="color: #f59e0b; font-size: 10px;">
+                                {{#each stars}}★{{/each}}
+                            </div>
+                            {{/if}}
+
+                            {{#if roomCount}}
+                            <div
+                                style="font-size: 10px; background: #f3f4f6; padding: 1px 6px; border-radius: 4px; color: #4b5563;">
+                                عدد الوحدات: {{roomCount}}
+                            </div>
+                            {{/if}}
+                        </div>
+
+                    </div>
+                </div>
+                <div class="hotel-nights font-bold"
+                    style="background: #eef2ff; color: #3730a3; padding: 4px 10px; border-radius: 6px; font-size: 11px;">
+                    {{nights}} ليالي
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        <!-- Services -->
+        {{#if services.length}}
+        <div class="section" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {{#each services}}
+            <div style="background: #f3f4f6; padding: 5px 15px; border-radius: 15px; font-size: 11px;">
+                ✨ {{this}}
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        <!-- Total -->
+        <div class="total-box">
+            <div class="total-title">السعر الإجمالي (شامل الضريبة)</div>
+            <div>
+                <span class="total-price ltr">{{totalPrice}}</span>
+                <span
+                    style="display: inline-block; width: 20px; vertical-align: middle; margin-right: 5px; color: #9ca3af;">
+                    <svg viewBox="0 0 1124.14 1256.39" fill="currentColor">
+                        <path
+                            d="M699.62,1113.02h0c-20.06,44.48-33.32,92.75-38.4,143.37l424.51-90.24c20.06-44.47,33.31-92.75,38.4-143.37l-424.51,90.24Z" />
+                        <path
+                            d="M1085.73,895.8c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.33v-135.2l292.27-62.11c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.27V66.13c-50.67,28.45-95.67,66.32-132.25,110.99v403.35l-132.25,28.11V0c-50.67,28.44-95.67,66.32-132.25,110.99v525.69l-295.91,62.88c-20.06,44.47-33.33,92.75-38.42,143.37l334.33-71.05v170.26l-358.3,76.14c-20.06,44.47-33.32,92.75-38.4,143.37l375.04-79.7c30.53-6.35,56.77-24.4,73.83-49.24l68.78-101.97v-.02c7.14-10.55,11.3-23.27,11.3-36.97v-149.98l132.25-28.11v270.4l424.53-90.28Z" />
+                    </svg>
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <span class="ltr">{{companyWebsite}}</span> | <span class="ltr">{{companyEmail}}</span>
+    </footer>
+
+</body>
+
+</html>

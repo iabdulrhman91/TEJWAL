@@ -70,6 +70,9 @@ async function main() {
         { code: 'JO', nameAr: 'الأردن', nameEn: 'Jordan' },
         { code: 'MA', nameAr: 'المغرب', nameEn: 'Morocco' },
         { code: 'TR', nameAr: 'تركيا', nameEn: 'Turkey' },
+        { code: 'BA', nameAr: 'البوسنة والهرسك', nameEn: 'Bosnia and Herzegovina' },
+        { code: 'GE', nameAr: 'جورجيا', nameEn: 'Georgia' },
+        { code: 'AZ', nameAr: 'أذربيجان', nameEn: 'Azerbaijan' },
         { code: 'UK', nameAr: 'بريطانيا', nameEn: 'United Kingdom' },
         { code: 'FR', nameAr: 'فرنسا', nameEn: 'France' },
         { code: 'DE', nameAr: 'ألمانيا', nameEn: 'Germany' },
@@ -80,7 +83,13 @@ async function main() {
         { code: 'MY', nameAr: 'ماليزيا', nameEn: 'Malaysia' },
         { code: 'ID', nameAr: 'إندونيسيا', nameEn: 'Indonesia' },
         { code: 'TH', nameAr: 'تايلاند', nameEn: 'Thailand' },
-        { code: 'MV', nameAr: 'المالديف', nameEn: 'Maldives' }
+        { code: 'MV', nameAr: 'المالديف', nameEn: 'Maldives' },
+        { code: 'JP', nameAr: 'اليابان', nameEn: 'Japan' },
+        { code: 'KR', nameAr: 'كوريا الجنوبية', nameEn: 'South Korea' },
+        { code: 'CN', nameAr: 'الصين', nameEn: 'China' },
+        { code: 'IN', nameAr: 'الهند', nameEn: 'India' },
+        { code: 'PH', nameAr: 'الفلبين', nameEn: 'Philippines' },
+        { code: 'VN', nameAr: 'فيتنام', nameEn: 'Vietnam' }
     ]
 
     for (const country of countries) {
@@ -103,16 +112,38 @@ async function main() {
     // Seed Airlines
     console.log('Seeding Airlines...')
     const airlines = [
+        // Saudi Arabia
         { code: 'SV', nameAr: 'الخطوط السعودية', nameEn: 'Saudi Arabian Airlines' },
+        { code: 'XY', nameAr: 'طيران ناس', nameEn: 'flynas' },
+        { code: 'F3', nameAr: 'طيران أديل', nameEn: 'Flyadeal' },
+
+        // GCC
         { code: 'EK', nameAr: 'طيران الإمارات', nameEn: 'Emirates' },
         { code: 'QR', nameAr: 'الخطوط القطرية', nameEn: 'Qatar Airways' },
         { code: 'EY', nameAr: 'الاتحاد للطيران', nameEn: 'Etihad Airways' },
-        { code: 'BA', nameAr: 'الخطوط البريطانية', nameEn: 'British Airways' },
-        { code: 'TK', nameAr: 'الخطوط التركية', nameEn: 'Turkish Airlines' },
-        { code: 'LH', nameAr: 'لوفتهانزا', nameEn: 'Lufthansa' },
+        { code: 'FZ', nameAr: 'فلاي دبي', nameEn: 'flydubai' },
+        { code: 'G9', nameAr: 'العربية للطيران', nameEn: 'Air Arabia' },
         { code: 'WY', nameAr: 'الطيران العماني', nameEn: 'Oman Air' },
+        { code: 'OV', nameAr: 'طيران السلام', nameEn: 'SalamAir' },
         { code: 'KU', nameAr: 'الخطوط الكويتية', nameEn: 'Kuwait Airways' },
-        { code: 'XY', nameAr: 'طيران ناس', nameEn: 'flynas' }
+        { code: 'J9', nameAr: 'طيران الجزيرة', nameEn: 'Jazeera Airways' },
+        { code: 'GF', nameAr: 'طيران الخليج', nameEn: 'Gulf Air' },
+
+        // Middle East
+        { code: 'MS', nameAr: 'مصر للطيران', nameEn: 'EgyptAir' },
+        { code: 'SM', nameAr: 'إير كايرو', nameEn: 'Air Cairo' },
+        { code: 'NP', nameAr: 'النيل للطيران', nameEn: 'Nile Air' },
+        { code: 'UJ', nameAr: 'المصرية العالمية', nameEn: 'AlMasria Universal' },
+        { code: 'RJ', nameAr: 'الملكية الأردنية', nameEn: 'Royal Jordanian' },
+        { code: 'ME', nameAr: 'طيران الشرق الأوسط', nameEn: 'Middle East Airlines' },
+
+        // International
+        { code: 'TK', nameAr: 'الخطوط التركية', nameEn: 'Turkish Airlines' },
+        { code: 'BA', nameAr: 'الخطوط البريطانية', nameEn: 'British Airways' },
+        { code: 'LH', nameAr: 'لوفتهانزا', nameEn: 'Lufthansa' },
+        { code: 'AF', nameAr: 'الخطوط الفرنسية', nameEn: 'Air France' },
+        { code: 'KL', nameAr: 'الخطوط الهولندية', nameEn: 'KLM' },
+        { code: 'W6', nameAr: 'ويز إير', nameEn: 'Wizz Air' }
     ]
 
     for (const airline of airlines) {

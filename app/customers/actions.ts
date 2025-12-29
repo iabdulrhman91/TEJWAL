@@ -195,11 +195,11 @@ export async function updateCustomerLastQuote(customerId: number) {
 }
 
 /**
- * Get all customers (Admin only)
+ * Get all customers (Authenticated only)
  */
 export async function getCustomers(searchQuery?: string) {
     const session = await getSession()
-    if (!session || session.role !== 'Admin') {
+    if (!session) {
         throw new Error('Unauthorized')
     }
 

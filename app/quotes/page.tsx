@@ -2,15 +2,15 @@ import { getQuotes, deleteQuote } from './actions'
 import Link from 'next/link'
 import { Plus, Trash2, FileText, Calendar, Users, Eye, Printer, MessageSquare, Clock } from 'lucide-react'
 import QuotesFilter from './QuotesFilter'
-import WhatsAppButton from './[id]/WhatsAppButton'
+
 import CurrencySymbol from '@/app/components/CurrencySymbol'
 
 export default async function QuotesPage({
     searchParams,
 }: {
-    searchParams: { query?: string, status?: string, date?: string }
+    searchParams: { query?: string, status?: string, date?: string, creator?: string }
 }) {
-    const quotes = await getQuotes(searchParams.query, searchParams.status, searchParams.date)
+    const quotes = await getQuotes(searchParams.query, searchParams.status, searchParams.date, searchParams.creator)
 
     const getStatusBadge = (status: string) => {
         const styles: any = {
@@ -60,6 +60,7 @@ export default async function QuotesPage({
                                 <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الوجهة</th>
                                 <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الإجمالي</th>
                                 <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">الحالة</th>
+
                                 <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">تاريخ الإنشاء</th>
                                 <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center min-w-[180px]">إجراءات سريعة</th>
                             </tr>
@@ -71,6 +72,12 @@ export default async function QuotesPage({
                                         <Link href={`/quotes/${quote.id}`} className="hover:underline">
                                             {quote.quoteNumber}
                                         </Link>
+                                        <div className="text-[11px] font-normal text-gray-400 mt-1 flex items-center gap-1">
+                                            <Users size={12} />
+                                            <span className="truncate max-w-[100px]" title={(quote as any).createdBy?.name}>
+                                                {(quote as any).createdBy?.name || '-'}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="font-semibold text-gray-900">{quote.customerName}</div>
@@ -90,6 +97,7 @@ export default async function QuotesPage({
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {getStatusBadge(quote.status)}
                                     </td>
+
                                     <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                                         <div className="flex items-center gap-1.5" title={new Date(quote.createdAt).toLocaleString('en-US')}>
                                             <Calendar size={14} />
@@ -109,21 +117,17 @@ export default async function QuotesPage({
                                             </Link>
 
                                             {/* 2. PDF */}
-                                            <a
-                                                href={`/api/quotes/${quote.id}/pdf`}
+                                            <Link
+                                                href={`/quotes/${quote.id}?print=true`}
                                                 target="_blank"
                                                 className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition border border-transparent hover:border-purple-100"
-                                                title="PDF"
+                                                title="طباعة"
                                             >
                                                 <Printer size={18} />
-                                            </a>
+                                            </Link>
 
                                             {/* 3. WhatsApp (If not locked) */}
-                                            {quote.status !== 'Approved' && quote.status !== 'Cancelled' && (
-                                                <div className="scale-90">
-                                                    <WhatsAppButton quoteId={quote.id} phone={quote.customerPhone} status={quote.status} />
-                                                </div>
-                                            )}
+                                            {/* 3. WhatsApp REMOVED */}
                                         </div>
                                     </td>
                                 </tr>

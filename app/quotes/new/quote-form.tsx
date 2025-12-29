@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Trash2, Save, Plane, Building2, Calendar, MapPin, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Edit3, CheckCircle2, PlaneTakeoff, PlaneLanding } from 'lucide-react'
+import { Plus, Trash2, Save, Plane, Building2, Calendar, MapPin, HelpCircle, ChevronDown, ChevronLeft, ChevronRight, Edit3, CheckCircle2, PlaneTakeoff, PlaneLanding, Send } from 'lucide-react'
 import { createQuote, updateQuote } from '../actions'
 import AirportAutocomplete from '@/app/components/AirportAutocomplete'
 import AirlineAutocomplete from '@/app/components/AirlineAutocomplete'
@@ -38,6 +38,97 @@ const ROOM_CATEGORIES: Record<string, string[]> = {
     'فلل وأكواخ': ['فيلا غرفة وصالة', 'فيلا غرفتين وصالة', 'فيلا ثلاث غرف وصالة', 'فيلا أربع غرف وصالة', 'كوخ', 'كوخ مطل على النهر', 'كوخ مطل على الجبل']
 }
 
+function SmartSelect({ value, onChange, options, placeholder = "اختر..." }: { value: string, onChange: (v: string) => void, options: { id?: string | number, name: string }[], placeholder?: string }) {
+    const [isOpen, setIsOpen] = useState(false)
+    const [isCustom, setIsCustom] = useState(false)
+    const [customVal, setCustomVal] = useState("")
+    const wrapperRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        function handleClickOutside(event: any) {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setIsOpen(false)
+                setIsCustom(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [wrapperRef]);
+
+    const handleSelect = (val: string) => {
+        onChange(val)
+        setIsOpen(false)
+    }
+
+    const handleCustomSubmit = () => {
+        if (customVal.trim()) {
+            onChange(customVal)
+            setIsOpen(false)
+            setIsCustom(false)
+            setCustomVal("")
+        }
+    }
+
+    return (
+        <div className="relative" ref={wrapperRef}>
+            <button
+                type="button"
+                onClick={() => { setIsOpen(!isOpen); setIsCustom(false); }}
+                className="w-full p-2 border rounded-lg bg-white text-sm text-right flex justify-between items-center hover:border-blue-400 transition-colors h-[42px]"
+            >
+                <span className={value ? 'font-bold text-gray-700' : 'text-gray-400'}>{value || placeholder}</span>
+                <ChevronDown size={14} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute top-full right-0 left-0 mt-1 bg-white border border-blue-100 rounded-xl shadow-xl z-[50] p-2 animate-in fade-in zoom-in-95 duration-200 min-w-[200px] max-h-60 overflow-y-auto overflow-x-hidden">
+                    {!isCustom ? (
+                        <div className="space-y-1">
+                            {options.map((opt, idx) => (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleSelect(opt.name)}
+                                    className="w-full text-right p-2 hover:bg-blue-50 rounded-lg text-sm text-gray-600 hover:text-blue-700 transition"
+                                >
+                                    {opt.name}
+                                </button>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => { setIsCustom(true); setCustomVal(value || ""); }}
+                                className="w-full text-right p-2 hover:bg-orange-50 rounded-lg flex justify-between items-center group text-orange-600 border-t mt-1 pt-2 font-bold text-sm"
+                            >
+                                <span>إدخال يدوي...</span>
+                                <Plus size={14} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="p-1">
+                            <div className="flex items-center gap-2 mb-2 border-b pb-2">
+                                <button type="button" onClick={() => setIsCustom(false)} className="p-1 hover:bg-gray-100 rounded text-gray-500"><ChevronRight size={16} /></button>
+                                <span className="font-bold text-xs text-orange-600">كتابة يدوية</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="اكتب هنا..."
+                                    value={customVal}
+                                    onChange={e => setCustomVal(e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleCustomSubmit() } }}
+                                    className="flex-1 min-w-0 p-2 border rounded-lg text-sm outline-none focus:border-orange-300"
+                                />
+                                <button type="button" onClick={handleCustomSubmit} className="bg-orange-500 text-white px-3 rounded-lg hover:bg-orange-600"><Plus size={16} /></button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    )
+}
+
 interface Flight {
     localId: string
     from: string
@@ -59,8 +150,10 @@ interface Flight {
     stopoverTime?: number // hours
     showReturnTransit?: boolean
     returnStopoverTime?: number // hours
+    returnCabinClass?: 'Economy' | 'Business' | 'First'
 
     airline: string
+    cabinClass?: 'Economy' | 'Business' | 'First'
     weight?: string
     flightType: 'OneWay' | 'RoundTrip'
     ticketCount: number
@@ -160,6 +253,7 @@ export default function QuoteForm({
             departure: f.departureDateTime ? new Date(f.departureDateTime).toISOString().slice(0, 16) : '',
             arrival: f.arrivalDateTime ? new Date(f.arrivalDateTime).toISOString().slice(0, 16) : '',
             airline: f.airline,
+            cabinClass: f.cabinClass || 'Economy',
             weight: f.weight,
             flightType: f.flightType,
             ticketCount: f.ticketCount,
@@ -173,7 +267,10 @@ export default function QuoteForm({
             returnDeparture: f.returnDepartureDateTime ? new Date(f.returnDepartureDateTime).toISOString().slice(0, 16) : '',
             returnArrival: f.returnArrivalDateTime ? new Date(f.returnArrivalDateTime).toISOString().slice(0, 16) : '',
             returnAirline: f.returnAirline,
+            returnCabinClass: f.returnCabinClass || f.cabinClass || 'Economy',
             returnWeight: f.returnWeight,
+            stopoverTime: f.stopoverTime,
+            returnStopoverTime: f.returnStopoverTime,
             showTransit: !!f.stopoverAirport,
             showReturnTransit: !!f.returnStopoverAirport,
             isCollapsed: true
@@ -204,7 +301,7 @@ export default function QuoteForm({
     const [activeRoomCategory, setActiveRoomCategory] = useState<string | null>(null)
     const [customRoomInputs, setCustomRoomInputs] = useState<Record<string, string>>({})
 
-    const [isCustomerCollapsed, setIsCustomerCollapsed] = useState(false)
+    const [isCustomerCollapsed, setIsCustomerCollapsed] = useState(!!initialData)
 
     // Handlers
     const addService = () => {
@@ -215,7 +312,7 @@ export default function QuoteForm({
             localId: Math.random().toString(36).substr(2, 9),
             name: '',
             unitPrice: 0,
-            quantity: 0,
+            quantity: 1,
             total: 0,
             costPrice: 0,
             supplier: '',
@@ -234,6 +331,7 @@ export default function QuoteForm({
             departure: '',
             arrival: '',
             airline: '',
+            cabinClass: 'Economy',
             flightType: 'OneWay',
             ticketCount: customer.adults + customer.children + customer.infants,
             weight: '',
@@ -257,7 +355,7 @@ export default function QuoteForm({
             checkOut: '',
             roomType: '',
             mealPlan: '',
-            roomCount: 0,
+            roomCount: 1, // Default to 1
             costPrice: 0,
             price: 0,
             supplier: '',
@@ -312,6 +410,31 @@ export default function QuoteForm({
                 let updated: Flight;
                 if (typeof data === 'string') {
                     updated = { ...f, [data]: value }
+                    if (data === 'showTransit' && value === false) {
+                        updated.stopover = ''
+                        updated.stopoverTime = 0
+                    }
+                    if (data === 'showReturnTransit' && value === false) {
+                        updated.returnStopover = ''
+                        updated.returnStopoverTime = 0
+                    }
+
+                    // Auto-calculate Arrival Time (Departure + 3 hours)
+                    if (data === 'departure' && value) {
+                        const d = new Date(value)
+                        if (!isNaN(d.getTime())) {
+                            d.setTime(d.getTime() + (3 * 60 * 60 * 1000))
+                            updated.arrival = d.toISOString()
+                        }
+                    }
+                    if (data === 'returnDeparture' && value) {
+                        const d = new Date(value)
+                        if (!isNaN(d.getTime())) {
+                            d.setTime(d.getTime() + (3 * 60 * 60 * 1000))
+                            updated.returnArrival = d.toISOString()
+                        }
+                    }
+
                     if (data === 'flightType' && value === 'RoundTrip') {
                         updated.returnFrom = f.to
                         updated.returnTo = f.from
@@ -320,7 +443,9 @@ export default function QuoteForm({
                         updated.returnStopoverTime = f.stopoverTime
                         updated.returnWeight = f.weight
                         updated.showReturnTransit = f.showTransit
+                        updated.returnCabinClass = f.cabinClass || 'Economy'
                     }
+
                 } else {
                     updated = { ...f, ...data }
                 }
@@ -360,9 +485,73 @@ export default function QuoteForm({
 
     const handleSubmit = async (e: React.FormEvent, type: 'Draft' | 'Send' = 'Draft') => {
         e.preventDefault()
-        if (!customer.name.trim()) { alert('يرجى إدخال اسم العميل'); return }
+        // Validation Logic
+        if (!customer.name.trim()) { alert('يرجى إدخال اسم العميل (حقل إلزامي)'); return }
+        if (!customer.phone.trim()) { alert('يرجى إدخال رقم الجوال (حقل إلزامي لربط العميل)'); return }
+        if (!customer.destination || (Array.isArray(customer.destination) && customer.destination.length === 0)) { alert('يرجى تحديد الوجهة (حقل إلزامي)'); return }
+
+        // Validate Items Completeness
         const hasItems = flights.length > 0 || hotels.length > 0 || selectedServices.length > 0
         if (!hasItems) { alert('يجب إضافة خدمة واحدة على الأقل'); return }
+
+        for (let i = 0; i < flights.length; i++) {
+            const f = flights[i]
+            // Basic One Way Checks
+            if (!f.from || !f.to || !f.departure || !f.arrival || !f.airline || !f.costPrice || !f.weight || !f.supplier) {
+                alert(`بيانات الرحلة رقم ${i + 1} (الذهاب) غير مكتملة. يرجى إكمال كافة الحقول (المغادرة والوصول والمورد والوزن).`)
+                return
+            }
+            if (new Date(f.arrival) < new Date(f.departure)) {
+                alert(`خطأ في تواريخ الرحلة رقم ${i + 1} (الذهاب): وقت الوصول لا يمكن أن يكون قبل وقت المغادرة.`)
+                return
+            }
+
+            // Round Trip Checks
+            if (f.flightType === 'RoundTrip') {
+                if (!f.returnDeparture || !f.returnArrival || !f.returnFrom || !f.returnTo || !f.returnWeight || !f.returnAirline) {
+                    alert(`بيانات الرحلة رقم ${i + 1} (العودة) غير مكتملة. يرجى إكمال كافة حقول العودة (التواريخ، الخطوط، الوزن).`)
+                    return
+                }
+                // Logical Date Check: Return cannot be before Departure
+                if (new Date(f.returnDeparture) < new Date(f.departure)) {
+                    alert(`خطأ في تواريخ الرحلة رقم ${i + 1}: تاريخ العودة لا يمكن أن يكون قبل تاريخ الذهاب.`)
+                    return
+                }
+                // Logical Date Check: Return Arrival cannot be before Return Departure
+                if (new Date(f.returnArrival) < new Date(f.returnDeparture)) {
+                    alert(`خطأ في تواريخ الرحلة رقم ${i + 1} (العودة): وقت وصول العودة لا يمكن أن يكون قبل وقت مغادرة العودة.`)
+                    return
+                }
+            }
+            // Transit Checks
+            if (f.showTransit && (!f.stopover || !f.stopoverTime)) {
+                alert(`بيانات الرحلة رقم ${i + 1} (ترانزيت الذهاب) غير مكتملة. يرجى تحديد مطار الترانزيت ومدة التوقف.`)
+                return
+            }
+            if (f.flightType === 'RoundTrip' && f.showReturnTransit && (!f.returnStopover || !f.returnStopoverTime)) {
+                alert(`بيانات الرحلة رقم ${i + 1} (ترانزيت العودة) غير مكتملة. يرجى تحديد مطار الترانزيت ومدة التوقف.`)
+                return
+            }
+        }
+        for (let i = 0; i < hotels.length; i++) {
+            const h = hotels[i]
+            if (!h.hotelName || !h.city || !h.stars || !h.checkIn || !h.checkOut || !h.costPrice || !h.roomCount || h.roomCount < 1 || !h.supplier || !h.roomType || !h.mealPlan) {
+                alert(`بيانات الفندق رقم ${i + 1} غير مكتملة. يرجى التأكد من التقييم (النجوم) وكافة البيانات الأخرى.`)
+                return
+            }
+            // Logical Date Check: CheckOut must be after CheckIn
+            if (new Date(h.checkOut) <= new Date(h.checkIn)) {
+                alert(`خطأ في تواريخ الفندق رقم ${i + 1}: تاريخ المغادرة يجب أن يكون بعد تاريخ الدخول.`)
+                return
+            }
+        }
+        for (let i = 0; i < selectedServices.length; i++) {
+            const s = selectedServices[i]
+            if (!s.name || !s.costPrice || !s.quantity || s.quantity < 1) {
+                alert(`بيانات الخدمة رقم ${i + 1} غير مكتملة. يرجى التأكد من الكمية والسعر.`)
+                return
+            }
+        }
 
         startTransition(async () => {
             const formData = {
@@ -440,15 +629,15 @@ export default function QuoteForm({
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div>
-                            <label className="block text-sm font-medium mb-1">اسم العميل</label>
+                            <label className="block text-sm font-medium mb-1">اسم العميل <span className="text-red-500">*</span></label>
                             <input required type="text" value={customer.name} onChange={e => setCustomer({ ...customer, name: e.target.value })} className="w-full p-2 border rounded-lg" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">الجوال</label>
+                            <label className="block text-sm font-medium mb-1">الجوال <span className="text-red-500">*</span></label>
                             <CustomerPhoneInput value={customer.phone} onChange={(value) => setCustomer({ ...customer, phone: value })} onCustomerFound={(info) => setCustomerInfo(info)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">الوجهة</label>
+                            <label className="block text-sm font-medium mb-1">الوجهة <span className="text-red-500">*</span></label>
                             <CountryMultiSelect
                                 value={customer.destination}
                                 onChange={val => setCustomer({ ...customer, destination: val })}
@@ -681,6 +870,7 @@ export default function QuoteForm({
                                                 <div className="mt-2 pt-2 border-t border-gray-100">
                                                     <div className="flex justify-between items-center mb-1">
                                                         <label className="text-[10px] text-blue-600 font-bold">ترانزيت</label>
+                                                        <button type="button" onClick={() => updateFlight(flight.localId, 'showTransit', false)} className="text-red-400 hover:text-red-600"><Trash2 size={12} /></button>
                                                     </div>
                                                     <AirportAutocomplete value={flight.stopover || ''} onChange={val => updateFlight(flight.localId, 'stopover', val)} placeholder="ترانزيت..." />
                                                 </div>
@@ -718,13 +908,14 @@ export default function QuoteForm({
                                                 selected={toDate(flight.arrival)}
                                                 onChange={date => updateFlight(flight.localId, 'arrival', fromDateTime(date))}
                                                 showTimeSelect
+                                                minDate={toDate(flight.departure)}
                                             />
                                         </div>
                                     </div>
 
                                     {/* Airline & Ticket Info */}
                                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4 bg-white p-4 rounded-xl border border-gray-100">
-                                        <div className="md:col-span-3"><label className="text-xs text-gray-500">الخطوط</label><AirlineAutocomplete value={flight.airline} onChange={val => updateFlight(flight.localId, 'airline', val)} placeholder="اختر شركة الطيران..." /></div>
+                                        <div className="md:col-span-4"><label className="text-xs text-gray-500">الخطوط</label><AirlineAutocomplete value={flight.airline} onChange={val => updateFlight(flight.localId, 'airline', val)} placeholder="اختر شركة الطيران..." /></div>
 
                                         {/* Weight - Outbound */}
                                         <div className="md:col-span-2">
@@ -743,8 +934,29 @@ export default function QuoteForm({
                                             />
                                         </div>
 
+                                        {/* Cabin Class Selection */}
+                                        <div className="md:col-span-3">
+                                            <label className="text-xs text-gray-500">الدرجة</label>
+                                            <div className="flex bg-gray-100 p-1 rounded-xl">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateFlight(flight.localId, 'cabinClass', 'Economy')}
+                                                    className={`flex-1 py-1.5 text-sm rounded-lg font-bold transition-all ${!flight.cabinClass || flight.cabinClass === 'Economy' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    سياحية
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateFlight(flight.localId, 'cabinClass', 'Business')}
+                                                    className={`flex-1 py-1.5 text-sm rounded-lg font-bold transition-all ${flight.cabinClass === 'Business' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    رجال أعمال
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         {/* Flight Type Selection - Restored Design */}
-                                        <div className="md:col-span-7">
+                                        <div className="md:col-span-3">
                                             <label className="text-xs text-gray-500">نوع الرحلة</label>
                                             <div className="flex bg-gray-100 p-1 rounded-xl">
                                                 <button
@@ -786,6 +998,7 @@ export default function QuoteForm({
                                                             <div className="mt-2 pt-2 border-t border-gray-100">
                                                                 <div className="flex justify-between items-center mb-1">
                                                                     <label className="text-[10px] text-blue-600 font-bold">ترانزيت العودة</label>
+                                                                    <button type="button" onClick={() => updateFlight(flight.localId, 'showReturnTransit', false)} className="text-red-400 hover:text-red-600"><Trash2 size={12} /></button>
                                                                 </div>
                                                                 <AirportAutocomplete value={flight.returnStopover || ''} onChange={val => updateFlight(flight.localId, 'returnStopover', val)} placeholder="ترانزيت..." />
                                                             </div>
@@ -801,6 +1014,7 @@ export default function QuoteForm({
                                                             selected={toDate(flight.returnDeparture)}
                                                             onChange={date => updateFlight(flight.localId, 'returnDeparture', fromDateTime(date))}
                                                             showTimeSelect
+                                                            minDate={toDate(flight.arrival) || toDate(flight.departure)}
                                                         />
                                                         {flight.showReturnTransit && (
                                                             <div className="mt-2 pt-2 border-t border-gray-100">
@@ -823,15 +1037,22 @@ export default function QuoteForm({
                                                             selected={toDate(flight.returnArrival)}
                                                             onChange={date => updateFlight(flight.localId, 'returnArrival', fromDateTime(date))}
                                                             showTimeSelect
+                                                            minDate={toDate(flight.returnDeparture)}
                                                         />
                                                     </div>
 
-                                                    {/* Return Airline & Weight */}
-                                                    <div>
-                                                        <label className="text-xs text-gray-500">خطوط العودة (اختياري)</label>
-                                                        <AirlineAutocomplete value={flight.returnAirline || flight.airline} onChange={val => updateFlight(flight.localId, 'returnAirline', val)} />
+                                                </div>
+
+                                                {/* Return Details Row - Matches Top Layout */}
+                                                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4 bg-white p-4 rounded-xl border border-gray-100">
+                                                    {/* Return Airline */}
+                                                    <div className="md:col-span-4">
+                                                        <label className="text-xs text-gray-500">خطوط العودة</label>
+                                                        <AirlineAutocomplete value={flight.returnAirline || flight.airline} onChange={val => updateFlight(flight.localId, 'returnAirline', val)} placeholder="اختر شركة الطيران..." />
                                                     </div>
-                                                    <div>
+
+                                                    {/* Return Weight */}
+                                                    <div className="md:col-span-2">
                                                         <label className="text-xs text-gray-500">الوزن (عودة) - كجم</label>
                                                         <input
                                                             type="text"
@@ -845,6 +1066,27 @@ export default function QuoteForm({
                                                             className="w-full p-2 border rounded-lg text-center font-bold num-en"
                                                             style={{ fontFamily: 'sans-serif' }}
                                                         />
+                                                    </div>
+
+                                                    {/* Return Class */}
+                                                    <div className="md:col-span-3">
+                                                        <label className="text-xs text-gray-500">الدرجة (عودة)</label>
+                                                        <div className="flex bg-gray-100 p-1 rounded-xl">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => updateFlight(flight.localId, 'returnCabinClass', 'Economy')}
+                                                                className={`flex-1 py-1.5 text-sm rounded-lg font-bold transition-all ${!flight.returnCabinClass || flight.returnCabinClass === 'Economy' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            >
+                                                                سياحية
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => updateFlight(flight.localId, 'returnCabinClass', 'Business')}
+                                                                className={`flex-1 py-1.5 text-sm rounded-lg font-bold transition-all ${flight.returnCabinClass === 'Business' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            >
+                                                                رجال أعمال
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -862,16 +1104,12 @@ export default function QuoteForm({
                                         {/* Supplier */}
                                         <div className="md:col-span-1">
                                             <label className="text-xs text-gray-500 mb-1 block">المورد</label>
-                                            <select
+                                            <SmartSelect
                                                 value={flight.supplier || ''}
-                                                onChange={e => updateFlight(flight.localId, 'supplier', e.target.value)}
-                                                className="w-full p-2 border rounded-lg text-sm bg-white h-[42px]"
-                                            >
-                                                <option value="">اختر المورد</option>
-                                                {flightSuppliers.map(s => (
-                                                    <option key={s.id} value={s.name}>{s.name}</option>
-                                                ))}
-                                            </select>
+                                                onChange={val => updateFlight(flight.localId, 'supplier', val)}
+                                                options={flightSuppliers}
+                                                placeholder="المورد..."
+                                            />
                                         </div>
 
                                         {/* Cost Price */}
@@ -1155,14 +1393,12 @@ export default function QuoteForm({
                                         <div><label className="text-xs text-gray-500">عدد الوحدات</label><NumberInput value={hotel.roomCount} onChange={val => updateHotel(hotel.localId, 'roomCount', val)} /></div>
                                         <div>
                                             <label className="text-xs text-gray-500">المورد</label>
-                                            <select
+                                            <SmartSelect
                                                 value={hotel.supplier || ''}
-                                                onChange={e => updateHotel(hotel.localId, 'supplier', e.target.value)}
-                                                className="w-full p-2 border rounded text-sm bg-white"
-                                            >
-                                                <option value="">-- المورد --</option>
-                                                {hotelSuppliers.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
-                                            </select>
+                                                onChange={val => updateHotel(hotel.localId, 'supplier', val)}
+                                                options={hotelSuppliers}
+                                                placeholder="المورد..."
+                                            />
                                         </div>
                                         <div>
                                             <label className="text-xs text-purple-600 font-bold mb-1 block">سعر التكلفة</label>
@@ -1235,10 +1471,12 @@ export default function QuoteForm({
                                 <div className="flex flex-col md:flex-row gap-4 items-end relative">
                                     <div className="flex-1 min-w-[200px]">
                                         <label className="block text-xs font-medium text-gray-500 mb-1">نوع الخدمة</label>
-                                        <select className="w-full p-2 border rounded-lg bg-white h-[42px]" onChange={e => updateService(service.localId, 'catalogId', e.target.value)} value={service.catalogId || ''}>
-                                            <option value="">-- اختر --</option>
-                                            {catalogServices.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                        </select>
+                                        <SmartSelect
+                                            value={service.name || ''}
+                                            onChange={val => updateService(service.localId, 'name', val)}
+                                            options={catalogServices}
+                                            placeholder="اختر الخدمة..."
+                                        />
                                     </div>
                                     {/* Cost Price */}
                                     <div className="w-32">
@@ -1320,8 +1558,7 @@ export default function QuoteForm({
 
             <div className="flex gap-4 justify-end mt-8">
                 <button type="button" onClick={() => router.back()} className="px-6 py-3 rounded-xl border hover:bg-gray-50 text-gray-600 transition">إلغاء</button>
-                <button type="button" disabled={isPending} onClick={e => handleSubmit(e, 'Draft')} className="px-8 py-3 rounded-xl border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition flex items-center gap-2 font-bold disabled:opacity-50">{isPending ? 'جاري الحفظ...' : <><Save size={20} /><span>حفظ كمسودة</span></>}</button>
-                <button type="button" disabled={isPending} onClick={e => handleSubmit(e, 'Send')} className="px-8 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition flex items-center gap-2 font-bold disabled:opacity-50">{isPending ? 'جاري الحفظ...' : <><Save size={20} /><span>حفظ وإرسال</span></>}</button>
+                <button type="button" disabled={isPending} onClick={e => handleSubmit(e, 'Draft')} className="px-8 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition flex items-center gap-2 font-bold disabled:opacity-50">{isPending ? 'جاري الحفظ...' : <><Save size={20} /><span>حفظ كمسودة</span></>}</button>
             </div>
         </form >
     )

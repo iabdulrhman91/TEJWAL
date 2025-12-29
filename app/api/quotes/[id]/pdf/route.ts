@@ -362,7 +362,7 @@ export async function GET(
         // Return PDF
         const response = new NextResponse(pdfBuffer as any)
         response.headers.set('Content-Type', 'application/pdf')
-        response.headers.set('Content-Disposition', `attachment; filename="Quote-${quote.quoteNumber}.pdf"`)
+        response.headers.set('Content-Disposition', `inline; filename="Quote-${quote.quoteNumber}.pdf"`)
         return response
 
     } catch (error) {

@@ -1,0 +1,111 @@
+{
+    "companyLogo": "https://i.ibb.co/3pZ0CqF/logo.png",
+    "customerName": "سعيد الغامدي",
+    "passengers": "2 بالغ، 1 طفل",
+    "quoteNumber": "1001",
+    "date": "28/12/2025",
+    "companyPhone": "017 222 7999",
+    "companyLocation": "خميس مشيط، المملكة العربية السعودية",
+    "companyEmail": "sales@tejwal.com",
+    "companyWebsite": "www.tejwal.com",
+    "validDays": "3",
+    "totalPrice": "15,200",
+    "flights": [
+        {
+            "airline": "الخطوط السعودية",
+            "from": "الرياض",
+            "to": "دبي",
+            "departure": "10:00 ص",
+            "arrival": "12:00 م",
+            "cabin": "اقتصادية",
+            "weight": "23 كجم",
+            "stops": "مباشر"
+        },
+        {
+            "airline": "الخطوط السعودية",
+            "from": "دبي",
+            "to": "الرياض",
+            "departure": "08:00 م",
+            "arrival": "10:00 م",
+            "cabin": "اقتصادية",
+            "weight": "23 كجم",
+            "stops": "مباشر"
+        },
+        {
+            "airline": "طيران ناس",
+            "from": "جدة",
+            "to": "القاهرة",
+            "departure": "05:00 ص",
+            "arrival": "06:30 ص",
+            "cabin": "رجال الأعمال",
+            "weight": "40 كجم",
+            "stops": "مباشر"
+        },
+        {
+            "airline": "مصر للطيران",
+            "from": "القاهرة",
+            "to": "جدة",
+            "departure": "11:00 م",
+            "arrival": "02:00 ص",
+            "cabin": "اقتصادية",
+            "weight": "2x23 كجم",
+            "stops": "توقف 1 (الأقصر) ساعتين ونصف"
+        }
+    ],
+    "hotels": [
+        {
+            "name": "هيلتون دبي جميرا",
+            "city": "دبي",
+            "nights": 3,
+            "room": "غرفة ديلوكس مطلة على البحر - إفطار",
+            "stars": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "roomCount": 2,
+            "checkIn": "01/01/2026",
+            "checkOut": "04/01/2026"
+        },
+        {
+            "name": "ريكسوس بريميوم",
+            "city": "دبي",
+            "nights": 2,
+            "room": "غرفة بريميوم - نصف إقامة",
+            "stars": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "roomCount": 1,
+            "checkIn": "04/01/2026",
+            "checkOut": "06/01/2026"
+        },
+        {
+            "name": "فيرمونت نايل سيتي",
+            "city": "القاهرة",
+            "nights": 4,
+            "room": "غرفة مطلة على النيل - غرفة فقط",
+            "stars": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "roomCount": 3,
+            "checkIn": "07/01/2026",
+            "checkOut": "11/01/2026"
+        }
+    ],
+    "services": [
+        "استقبال خاص من المطار (دبي) - عدد 2",
+        "جولة خاصة في المتحف المصري - عدد 1",
+        "عشاء في مركب نيلي - عدد 4",
+        "تأمين سفر (ذهبي) - عدد 2"
+    ]
+}

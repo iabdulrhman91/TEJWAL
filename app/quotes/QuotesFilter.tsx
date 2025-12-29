@@ -57,10 +57,10 @@ export default function QuotesFilter() {
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                 >
                     <option value="All">كل الحالات</option>
-                    <option value="Draft">مسودة (Draft)</option>
-                    <option value="Sent">تم الإرسال (Sent)</option>
-                    <option value="Approved">معتمد (Approved)</option>
-                    <option value="Cancelled">ملغي (Cancelled)</option>
+                    <option value="Draft">مسودة</option>
+                    <option value="Sent">تم الإرسال</option>
+                    <option value="Approved">معتمد</option>
+                    <option value="Cancelled">ملغي</option>
                 </select>
             </div>
 
@@ -76,6 +76,19 @@ export default function QuotesFilter() {
                     <option value="Week">آخر 7 أيام</option>
                     <option value="Month">هذا الشهر</option>
                 </select>
+            </div>
+
+            {/* Helper: My Quotes Toggle */}
+            <div className="flex-none">
+                <button
+                    onClick={() => handleFilter('creator', searchParams.get('creator') === 'me' ? 'All' : 'me')}
+                    className={`px-4 py-2 rounded-lg font-bold text-sm transition border ${searchParams.get('creator') === 'me'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                        }`}
+                >
+                    عروضي الخاصة
+                </button>
             </div>
         </div>
     )

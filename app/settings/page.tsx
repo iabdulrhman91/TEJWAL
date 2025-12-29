@@ -28,7 +28,11 @@ export default async function SettingsPage() {
         <div className="p-8 max-w-7xl mx-auto">
             <header className="mb-10">
                 <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">الإعدادات</h1>
-                <p className="text-gray-500 font-medium">تحكم في حسابك، الموظفين، والموردين، والروابط التقنية</p>
+                <p className="text-gray-500 font-medium">
+                    {session.role === 'Admin'
+                        ? 'تحكم في حسابك، الموظفين، والموردين، والروابط التقنية'
+                        : 'تحكم في إعدادات حسابك الشخصي وتغيير كلمة المرور'}
+                </p>
             </header>
 
             <SettingsContainer

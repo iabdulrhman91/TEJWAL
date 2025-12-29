@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Tajawal } from 'next/font/google'
 import './globals.css'
 import Navbar from './components/Navbar'
 
-const inter = Inter({ subsets: ['latin'] })
+const tajawal = Tajawal({
+    subsets: ['arabic', 'latin'],
+    weight: ['200', '300', '400', '500', '700', '800', '900']
+})
 
 export const metadata: Metadata = {
     title: 'عروض الأسعار - تجوال',
@@ -17,7 +20,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en-US" dir="rtl">
-            <body className={inter.className}>
+            <body className={tajawal.className}>
                 <Navbar />
                 <main className="min-h-screen bg-gray-50 text-gray-900">
                     {children}

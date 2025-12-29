@@ -29,13 +29,22 @@ export default async function EditQuotePage({ params }: { params: { id: string }
         redirect(`/quotes/${params.id}`)
     }
 
-    // Sales can only edit their own quotes, Admin can edit any
-    if (session.role !== 'Admin' && quote.createdByUserId !== session.id) {
-        redirect(`/quotes/${params.id}`)
+    if (session.role !== 'Admin' && quote.createdByUserId !== parseInt(session.id)) {
+        return (
+            <div className="max-w-2xl mx-auto p-8 mt-20 text-center">
+                <div className="bg-red-50 text-red-800 p-6 rounded-xl border border-red-200 shadow-sm">
+                    <h2 className="text-xl font-bold mb-2">عفواً، لا تملك صلاحية التعديل</h2>
+                    <p className="mb-6">هذا العرض تم إنشاؤه بواسطة موظف آخر، ولا يمكن تعديله إلا من قبله أو من قبل المدير.</p>
+                    <a href={`/quotes/${params.id}`} className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">
+                        عودة لتفاصيل العرض
+                    </a>
+                </div>
+            </div>
+        )
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-8">
+        <div className="max-w-5xl mx-auto p-8">
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">تعديل عرض السعر</h1>
